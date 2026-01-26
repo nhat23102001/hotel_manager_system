@@ -1,0 +1,79 @@
+@{
+    ViewData["Title"] = "Dashboard";
+}
+
+<div class="d-flex align-items-center justify-content-between mb-4">
+    <div>
+        <h3 class="fw-bold mb-1">Chào mừng, @ViewData["DisplayName"]!</h3>
+        <p class="text-muted mb-0">Tổng quan nhanh về hệ thống.</p>
+    </div>
+    <div class="text-end">
+        <span class="badge bg-secondary">@DateTime.Now.ToString("dd/MM/yyyy")</span>
+    </div>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-4">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                    <span class="text-muted">Tổng phòng</span>
+                    <span class="badge bg-primary">Phòng</span>
+                </div>
+                <h4 class="fw-bold">@ViewData["TotalRooms"]</h4>
+                <p class="text-muted small mb-0">Bao gồm tất cả loại phòng khả dụng.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                    <span class="text-muted">Đặt phòng</span>
+                    <span class="badge bg-success">Booking</span>
+                </div>
+                <h4 class="fw-bold">@ViewData["TotalBookings"]</h4>
+                <p class="text-muted small mb-0">Tổng số đơn đặt phòng đã ghi nhận.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                    <span class="text-muted">Khách hàng</span>
+                    <span class="badge bg-warning text-dark">Client</span>
+                </div>
+                <h4 class="fw-bold">@ViewData["TotalClients"]</h4>
+                <p class="text-muted small mb-0">Khách hàng đã đăng ký tài khoản.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-3">
+    <div class="col-lg-8">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-white border-0">
+                <h6 class="mb-0">Hoạt động gần đây</h6>
+            </div>
+            <div class="card-body">
+                <p class="text-muted mb-0">Chức năng chi tiết sẽ được bổ sung ở các module quản lý phòng, đặt phòng và dịch vụ.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-4">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-white border-0">
+                <h6 class="mb-0">Ghi chú nhanh</h6>
+            </div>
+            <div class="card-body">
+                <ul class="list-unstyled mb-0 small text-muted">
+                    <li>• Thêm CRUD phòng và loại phòng.</li>
+                    <li>• Quản lý booking và dịch vụ kèm.</li>
+                    <li>• Báo cáo doanh thu và công suất phòng.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>

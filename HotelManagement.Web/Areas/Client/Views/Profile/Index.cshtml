@@ -1,0 +1,131 @@
+@model HotelManagement.Web.DTOs.ProfileUpdateDto
+@{
+    ViewData["Title"] = "Thông tin cá nhân";
+    Layout = "~/Areas/Client/Views/Shared/_Layout.cshtml";
+}
+
+<!-- Hero Area -->
+<div class="slider-area hero-bg1 hero-overly">
+    <div class="single-slider slider-height3 d-flex align-items-center">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-xl-7 col-lg-11">
+                    <div class="hero-caption hero-caption3">
+                        <h1>Thông tin cá nhân</h1>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Profile Form Section -->
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow border-0">
+                <div class="card-body p-4 p-md-5">
+                    <div class="mb-4">
+                        <h4 class="fw-bold mb-1">
+                            <i class="fas fa-user-circle text-primary me-2"></i>Cập nhật thông tin
+                        </h4>
+                        <p class="text-muted small mb-0">Tài khoản: <strong>@ViewBag.Username</strong></p>
+                    </div>
+
+                    @if (TempData["ProfileSuccess"] != null)
+                    {
+                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                            <i class="fas fa-check-circle"></i> @TempData["ProfileSuccess"]
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    }
+
+                    @if (TempData["ProfileError"] != null)
+                    {
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            <i class="fas fa-exclamation-circle"></i> @TempData["ProfileError"]
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    }
+
+                    <form asp-area="Client" asp-controller="Profile" asp-action="Index" method="post">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label asp-for="FullName" class="form-label fw-semibold">
+                                    <i class="fas fa-id-card text-primary me-1"></i> Họ và tên
+                                </label>
+                                <input asp-for="FullName" class="form-control" placeholder="Nhập họ và tên" />
+                                <span asp-validation-for="FullName" class="text-danger d-block mt-1 small"></span>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label asp-for="Email" class="form-label fw-semibold">
+                                    <i class="fas fa-envelope text-primary me-1"></i> Email <span class="text-danger">*</span>
+                                </label>
+                                <input asp-for="Email" class="form-control" placeholder="Nhập email" type="email" />
+                                <span asp-validation-for="Email" class="text-danger d-block mt-1 small"></span>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label asp-for="PhoneNumber" class="form-label fw-semibold">
+                                    <i class="fas fa-phone text-primary me-1"></i> Số điện thoại
+                                </label>
+                                <input asp-for="PhoneNumber" class="form-control" placeholder="Nhập số điện thoại" />
+                                <span asp-validation-for="PhoneNumber" class="text-danger d-block mt-1 small"></span>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label asp-for="DateOfBirth" class="form-label fw-semibold">
+                                    <i class="fas fa-calendar text-primary me-1"></i> Ngày sinh
+                                </label>
+                                <input asp-for="DateOfBirth" class="form-control" type="date" />
+                                <span asp-validation-for="DateOfBirth" class="text-danger d-block mt-1 small"></span>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label asp-for="Gender" class="form-label fw-semibold">
+                                    <i class="fas fa-venus-mars text-primary me-1"></i> Giới tính
+                                </label>
+                                <select asp-for="Gender" class="form-select">
+                                    <option value="">-- Chọn giới tính --</option>
+                                    <option value="Nam">Nam</option>
+                                    <option value="Nữ">Nữ</option>
+                                    <option value="Khác">Khác</option>
+                                </select>
+                                <span asp-validation-for="Gender" class="text-danger d-block mt-1 small"></span>
+                            </div>
+
+                            <div class="col-md-12">
+                                <label asp-for="Address" class="form-label fw-semibold">
+                                    <i class="fas fa-map-marker-alt text-primary me-1"></i> Địa chỉ
+                                </label>
+                                <textarea asp-for="Address" class="form-control" rows="3" placeholder="Nhập địa chỉ"></textarea>
+                                <span asp-validation-for="Address" class="text-danger d-block mt-1 small"></span>
+                            </div>
+                        </div>
+
+                        <div asp-validation-summary="ModelOnly" class="text-danger my-3 small"></div>
+
+                        <div class="alert alert-info mt-4">
+                            <i class="fas fa-info-circle me-2"></i>
+                            <strong>Lưu ý:</strong> Email là thông tin bắt buộc và sẽ được sử dụng để gửi thông tin đặt phòng.
+                        </div>
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                            <a asp-area="Client" asp-controller="Home" asp-action="Index" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left me-2"></i>Quay lại
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-2"></i>Lưu thông tin
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="~/Views/Shared/_ValidationScriptsPartial.cshtml" />
+}

@@ -1,0 +1,190 @@
+@model IEnumerable<HotelManagement.Web.DTOs.RoomDto>
+@{
+    ViewData["Title"] = "Quản lý phòng";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h4 class="mb-0">Quản lý phòng</h4>
+    @if (User.IsInRole("Admin"))
+    {
+        <a asp-action="Create" class="btn btn-primary">
+            <i class="bi bi-plus-circle"></i> Thêm phòng
+        </a>
+    }
+</div>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show">
+        @TempData["Success"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show">
+        @TempData["Error"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+<div class="card border-0 shadow-sm mb-4">
+    <div class="card-body">
+        <h6 class="mb-3"><i class="bi bi-funnel"></i> Bộ lọc tìm kiếm</h6>
+        <form asp-action="Index" method="get" class="row g-3">
+            <div class="col-md-3">
+                <label class="form-label fw-bold"><i class="bi bi-calendar-check text-success"></i> Ngày nhận phòng</label>
+                <input type="date" name="checkInDate" value="@ViewBag.CheckInDate" class="form-control" min="@DateTime.Today.ToString("yyyy-MM-dd")" />
+            </div>
+            <div class="col-md-3">
+                <label class="form-label fw-bold"><i class="bi bi-calendar-x text-danger"></i> Ngày trả phòng</label>
+                <input type="date" name="checkOutDate" value="@ViewBag.CheckOutDate" class="form-control" min="@DateTime.Today.AddDays(1).ToString("yyyy-MM-dd")" />
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Tìm theo tên/mã phòng</label>
+                <input type="text" name="searchName" value="@ViewBag.SearchName" class="form-control" placeholder="Nhập tên hoặc mã phòng" />
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Loại phòng</label>
+                <select name="roomTypeId" class="form-select">
+                    <option value="">-- Tất cả --</option>
+                    @foreach (var rt in (IEnumerable<SelectListItem>)ViewBag.RoomTypes)
+                    {
+                        <option value="@rt.Value" selected="@(rt.Value == ViewBag.RoomTypeId?.ToString())">@rt.Text</option>
+                    }
+                </select>
+            </div>
+            <div class="col-12">
+                <button type="submit" class="btn btn-primary me-2"><i class="bi bi-search"></i> Tìm kiếm</button>
+                <a asp-action="Index" class="btn btn-secondary"><i class="bi bi-arrow-clockwise"></i> Xóa lọc</a>
+            </div>
+        </form>
+        
+        @if (!string.IsNullOrWhiteSpace(ViewBag.CheckInDate) && !string.IsNullOrWhiteSpace(ViewBag.CheckOutDate))
+        {
+            <div class="alert alert-info mt-3 mb-0">
+                <i class="bi bi-info-circle"></i>
+                Hiển thị tình trạng phòng từ <strong>@DateTime.Parse(ViewBag.CheckInDate).ToString("dd/MM/yyyy")</strong> đến <strong>@DateTime.Parse(ViewBag.CheckOutDate).ToString("dd/MM/yyyy")</strong>
+            </div>
+        }
+    </div>
+</div>
+
+<div class="card border-0 shadow-sm">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Mã phòng</th>
+                        <th>Tên phòng</th>
+                        <th>Loại phòng</th>
+                        <th>Giá/đêm</th>
+                        <th>Số người</th>
+                        <th>Trạng thái</th>
+                        <th style="width: 180px;">Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td><strong>@item.RoomCode</strong></td>
+                            <td>@item.RoomName</td>
+                            <td>@item.RoomType</td>
+                            <td>@item.PricePerNight.ToString("N0") đ</td>
+                            <td>@(item.MaxPeople?.ToString() ?? "-")</td>
+                            <td>
+                                @{
+                                    var roomBookings = ViewBag.RoomBookings as Dictionary<int, List<dynamic>>;
+                                    var hasBooking = roomBookings != null && roomBookings.ContainsKey(item.Id) && roomBookings[item.Id].Any();
+                                }
+                                
+                                @if (!string.IsNullOrWhiteSpace(ViewBag.CheckInDate) && !string.IsNullOrWhiteSpace(ViewBag.CheckOutDate))
+                                {
+                                    @if (hasBooking)
+                                    {
+                                        var booking = roomBookings[item.Id].First();
+                                        <span class="badge bg-danger mb-1"><i class="bi bi-person-fill"></i> Đã đặt</span>
+                                        <small class="d-block text-muted">Khách: <strong>@booking.CustomerName</strong></small>
+                                        <small class="d-block text-muted">@booking.CheckInDate.ToString("dd/MM") - @booking.CheckOutDate.ToString("dd/MM/yyyy")</small>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-success"><i class="bi bi-check-circle"></i> Còn trống</span>
+                                    }
+                                }
+                                else
+                                {
+                                    @if (item.Status == "Available")
+                                    {
+                                        <span class="badge bg-success">Khả dụng</span>
+                                    }
+                                    else if (item.Status == "Maintenance")
+                                    {
+                                        <span class="badge bg-warning text-dark">Bảo trì</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-warning">@item.Status</span>
+                                    }
+                                }
+                            </td>
+                            <td>
+                                <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-outline-info">Chi tiết</a>
+                                @if (User.IsInRole("Admin"))
+                                {
+                                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary">Sửa</a>
+                                    <button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteModal" data-id="@item.Id" data-name="@item.RoomCode">Xóa</button>
+                                }
+                            </td>
+                        </tr>
+                    }
+                    @if (!Model.Any())
+                    {
+                        <tr>
+                            <td colspan="7" class="text-center text-muted">Không tìm thấy phòng nào.</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Xác nhận xóa</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Bạn có chắc chắn muốn xóa phòng <strong id="deleteItemName"></strong> không?</p>
+            </div>
+            <div class="modal-footer">
+                <form id="deleteForm" method="post">
+                    @Html.AntiForgeryToken()
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="submit" class="btn btn-danger">Xóa</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        var deleteModal = document.getElementById('deleteModal');
+        deleteModal.addEventListener('show.bs.modal', function (event) {
+            var button = event.relatedTarget;
+            var id = button.getAttribute('data-id');
+            var name = button.getAttribute('data-name');
+            
+            document.getElementById('deleteItemName').textContent = name;
+            document.getElementById('deleteForm').action = '@Url.Action("Delete")/' + id;
+        });
+    </script>
+}

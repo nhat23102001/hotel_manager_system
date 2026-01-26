@@ -1,0 +1,27 @@
+@model HotelManagement.Web.DTOs.ServiceTypeDto
+@{
+    ViewData["Title"] = "Thêm loại dịch vụ";
+}
+
+<h4 class="mb-4">Thêm loại dịch vụ</h4>
+
+<div class="card border-0 shadow-sm">
+    <div class="card-body">
+        <form asp-action="Create" method="post" class="row g-3">
+            @Html.AntiForgeryToken()
+            <div class="col-12">
+                <label asp-for="Name" class="form-label"></label>
+                <input asp-for="Name" class="form-control" placeholder="Nhập tên loại dịch vụ" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+            <div class="col-12">
+                <a asp-action="Index" class="btn btn-secondary">Quay lại</a>
+                <button type="submit" class="btn btn-primary">Lưu</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

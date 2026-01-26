@@ -1,0 +1,270 @@
+@model HotelManagement.Web.DTOs.BlogDto
+@{
+    ViewData["Title"] = Model.Title;
+    var related = ViewBag.RelatedBlogs as List<HotelManagement.Web.DTOs.BlogDto> ?? new();
+    var prevPost = related.FirstOrDefault();
+    var nextPost = related.Skip(1).FirstOrDefault();
+}
+
+<!-- Hero Area Start-->
+<div class="slider-area hero-bg1  hero-overly">
+    <div class="single-slider  slider-height3 d-flex align-items-center">
+        <div class="container">
+            <div class="row justify-content-center ">
+                <div class="col-xl-7 col-lg-11">
+                    <div class="hero-caption hero-caption3">
+                        <h1>Blog Details</h1>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!--Hero Area End-->
+
+<!-- Blog Area Start -->
+<section class="blog_area single-post-area section-padding">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 posts-list">
+                <div class="single-post">
+                    <div class="feature-img">
+                        @if (!string.IsNullOrWhiteSpace(Model.Thumbnail) && !string.IsNullOrWhiteSpace(Model.ThumbnailFileName))
+                        {
+                            <img class="img-fluid" src="@Url.Action("GetImage", "Image", new { area = "Admin", filename = Model.ThumbnailFileName })" alt="@Model.Title">
+                        }
+                        else
+                        {
+                            <img class="img-fluid" src="assets/img/blog/single_blog_1.jpg" alt="@Model.Title">
+                        }
+                    </div>
+                    <div class="blog_details">
+                        <h2 style="color: #2d2d2d;">@Model.Title</h2>
+                        <ul class="blog-info-link mt-3 mb-4">
+                            <li><span><i class="fa fa-user"></i> @(Model.AuthorName ?? "Admin")</span></li>
+                            <li><span><i class="fa fa-calendar"></i> @((Model.PublishedAt ?? Model.CreatedAt).ToString("dd MMM, yyyy"))</span></li>
+                        </ul>
+                        @if (!string.IsNullOrWhiteSpace(Model.Summary))
+                        {
+                            <p class="excert">@Model.Summary</p>
+                        }
+                        @if (!string.IsNullOrWhiteSpace(Model.Content))
+                        {
+                            @Html.Raw(Model.Content.Replace("\n", "<br/>").Replace("\r", string.Empty))
+                        }
+                    </div>
+                </div>
+
+                <div class="navigation-top">
+                    <div class="d-sm-flex justify-content-between text-center">
+                        <p class="like-info"><span class="align-middle"><i class="fa fa-heart"></i></span> Bài viết nổi bật</p>
+                        <div class="col-sm-4 text-center my-2 my-sm-0"></div>
+                        <ul class="social-icons">
+                            <li><a href="#"><i class="fab fa-facebook-f"></i></a></li>
+                            <li><a href="#"><i class="fab fa-twitter"></i></a></li>
+                            <li><a href="#"><i class="fab fa-dribbble"></i></a></li>
+                            <li><a href="#"><i class="fab fa-behance"></i></a></li>
+                        </ul>
+                    </div>
+
+                    @if (prevPost != null || nextPost != null)
+                    {
+                        <div class="navigation-area">
+                            <div class="row">
+                                <div class="col-lg-6 col-md-6 col-12 nav-left flex-row d-flex justify-content-start align-items-center">
+                                    @if (prevPost != null)
+                                    {
+                                        <div class="thumb">
+                                            @if (!string.IsNullOrWhiteSpace(prevPost.Thumbnail) && !string.IsNullOrWhiteSpace(prevPost.ThumbnailFileName))
+                                            {
+                                                <a asp-area="Client" asp-controller="Blog" asp-action="Detail" asp-route-slug="@prevPost.Slug">
+                                                    <img class="img-fluid" src="@Url.Action("GetImage", "Image", new { area = "Admin", filename = prevPost.ThumbnailFileName })" alt="@prevPost.Title">
+                                                </a>
+                                            }
+                                        </div>
+                                        <div class="detials">
+                                            <p>Prev Post</p>
+                                            <a asp-area="Client" asp-controller="Blog" asp-action="Detail" asp-route-slug="@prevPost.Slug">
+                                                <h4 style="color: #2d2d2d;">@prevPost.Title</h4>
+                                            </a>
+                                        </div>
+                                    }
+                                </div>
+                                <div class="col-lg-6 col-md-6 col-12 nav-right flex-row d-flex justify-content-end align-items-center">
+                                    @if (nextPost != null)
+                                    {
+                                        <div class="detials text-end">
+                                            <p>Next Post</p>
+                                            <a asp-area="Client" asp-controller="Blog" asp-action="Detail" asp-route-slug="@nextPost.Slug">
+                                                <h4 style="color: #2d2d2d;">@nextPost.Title</h4>
+                                            </a>
+                                        </div>
+                                        <div class="thumb">
+                                            @if (!string.IsNullOrWhiteSpace(nextPost.Thumbnail) && !string.IsNullOrWhiteSpace(nextPost.ThumbnailFileName))
+                                            {
+                                                <a asp-area="Client" asp-controller="Blog" asp-action="Detail" asp-route-slug="@nextPost.Slug">
+                                                    <img class="img-fluid" src="@Url.Action("GetImage", "Image", new { area = "Admin", filename = nextPost.ThumbnailFileName })" alt="@nextPost.Title">
+                                                </a>
+                                            }
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+
+                <div class="blog-author">
+                    <div class="media align-items-center">
+                        <div class="thumb" style="width:80px;height:80px;border-radius:50%;background:#2563eb;display:flex;align-items:center;justify-content:center;">
+                            <i class="fas fa-user" style="color:white;font-size:36px;"></i>
+                        </div>
+                        <div class="media-body">
+                            <a href="#"><h4>@(Model.AuthorName ?? "Admin")</h4></a>
+                            <p>Chuyên gia du lịch và quản lý khách sạn.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="comments-area">
+                    <h4>05 Comments</h4>
+                    <div class="comment-list">
+                        <div class="single-comment justify-content-between d-flex">
+                            <div class="user justify-content-between d-flex">
+                                <div class="thumb">
+                                    <img src="assets/img/blog/comment_1.png" alt="">
+                                </div>
+                                <div class="desc">
+                                    <p class="comment">Tính năng bình luận sẽ sớm được bổ sung.</p>
+                                    <div class="d-flex justify-content-between">
+                                        <div class="d-flex align-items-center">
+                                            <h5><a href="#">Khách</a></h5>
+                                            <p class="date">--</p>
+                                        </div>
+                                        <div class="reply-btn">
+                                            <a href="#" class="btn-reply text-uppercase">reply</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="comment-form">
+                    <h4>Leave a Reply</h4>
+                    <form class="form-contact comment_form" action="#" id="commentForm">
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="form-group">
+                                    <textarea class="form-control w-100" name="comment" id="comment" cols="30" rows="9" placeholder="Write Comment"></textarea>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <input class="form-control" name="name" id="name" type="text" placeholder="Name">
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <input class="form-control" name="email" id="email" type="email" placeholder="Email">
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="form-group">
+                                    <input class="form-control" name="website" id="website" type="text" placeholder="Website">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <button type="submit" class="button button-contactForm btn_1 boxed-btn">Post Comment</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="blog_right_sidebar">
+                    <aside class="single_sidebar_widget search_widget">
+                        <form asp-area="Client" asp-controller="Blog" asp-action="Index" method="get">
+                            <div class="form-group m-0">
+                                <div class="input-group">
+                                    <input type="text" name="search" class="form-control" placeholder="Search Keyword">
+                                    <div class="input-group-append d-flex">
+                                        <button class="boxed-btn2" type="submit">Search</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </aside>
+                    <aside class="single_sidebar_widget post_category_widget">
+                        <h4 class="widget_title" style="color: #2d2d2d;">Category</h4>
+                        <ul class="list cat-list">
+                            <li><a href="#" class="d-flex"><p>Resaurant food</p><p>(37)</p></a></li>
+                            <li><a href="#" class="d-flex"><p>Travel news</p><p>(10)</p></a></li>
+                            <li><a href="#" class="d-flex"><p>Modern technology</p><p>(03)</p></a></li>
+                            <li><a href="#" class="d-flex"><p>Product</p><p>(11)</p></a></li>
+                            <li><a href="#" class="d-flex"><p>Inspiration</p><p>(21)</p></a></li>
+                            <li><a href="#" class="d-flex"><p>Health Care</p><p>(21)</p></a></li>
+                        </ul>
+                    </aside>
+                    <aside class="single_sidebar_widget popular_post_widget">
+                        <h3 class="widget_title" style="color: #2d2d2d;">Recent Post</h3>
+                        @if (related.Any())
+                        {
+                            foreach (var item in related.Take(4))
+                            {
+                                <div class="media post_item">
+                                    @if (!string.IsNullOrWhiteSpace(item.Thumbnail) && !string.IsNullOrWhiteSpace(item.ThumbnailFileName))
+                                    {
+                                        <img src="@Url.Action("GetImage", "Image", new { area = "Admin", filename = item.ThumbnailFileName })" alt="@item.Title" style="width: 80px; height: 80px; object-fit: cover;">
+                                    }
+                                    <div class="media-body">
+                                        <a asp-area="Client" asp-controller="Blog" asp-action="Detail" asp-route-slug="@item.Slug">
+                                            <h3 style="color: #2d2d2d;">@item.Title</h3>
+                                        </a>
+                                        <p>@((item.PublishedAt ?? item.CreatedAt).ToString("dd MMM, yyyy"))</p>
+                                    </div>
+                                </div>
+                            }
+                        }
+                    </aside>
+                    <aside class="single_sidebar_widget tag_cloud_widget">
+                        <h4 class="widget_title" style="color: #2d2d2d;">Tag Clouds</h4>
+                        <ul class="list">
+                            <li><a href="#">project</a></li>
+                            <li><a href="#">love</a></li>
+                            <li><a href="#">technology</a></li>
+                            <li><a href="#">travel</a></li>
+                            <li><a href="#">restaurant</a></li>
+                            <li><a href="#">life style</a></li>
+                            <li><a href="#">design</a></li>
+                            <li><a href="#">illustration</a></li>
+                        </ul>
+                    </aside>
+                    <aside class="single_sidebar_widget instagram_feeds">
+                        <h4 class="widget_title" style="color: #2d2d2d;">Instagram Feeds</h4>
+                        <ul class="instagram_row flex-wrap">
+                            <li><a href="#"><img class="img-fluid" src="assets/img/post/post_5.jpg" alt=""></a></li>
+                            <li><a href="#"><img class="img-fluid" src="assets/img/post/post_6.jpg" alt=""></a></li>
+                            <li><a href="#"><img class="img-fluid" src="assets/img/post/post_7.jpg" alt=""></a></li>
+                            <li><a href="#"><img class="img-fluid" src="assets/img/post/post_8.jpg" alt=""></a></li>
+                            <li><a href="#"><img class="img-fluid" src="assets/img/post/post_9.jpg" alt=""></a></li>
+                            <li><a href="#"><img class="img-fluid" src="assets/img/post/post_10.jpg" alt=""></a></li>
+                        </ul>
+                    </aside>
+                    <aside class="single_sidebar_widget newsletter_widget">
+                        <h4 class="widget_title" style="color: #2d2d2d;">Newsletter</h4>
+                        <form action="#">
+                            <div class="form-group">
+                                <input type="email" class="form-control" onfocus="this.placeholder = ''" onblur="this.placeholder = 'Enter email'" placeholder='Enter email' required>
+                            </div>
+                            <button class="button rounded-0 primary-bg text-white w-100 btn_1 boxed-btn" type="submit">Subscribe</button>
+                        </form>
+                    </aside>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- Blog Area End -->

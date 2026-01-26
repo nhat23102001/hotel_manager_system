@@ -1,0 +1,149 @@
+@model IEnumerable<HotelManagement.Web.DTOs.BookingDto>
+@{
+    ViewData["Title"] = "Quản lý đặt phòng";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h4 class="mb-0">Quản lý đặt phòng</h4>
+</div>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show">
+        @TempData["Success"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show">
+        @TempData["Error"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+<div class="card border-0 shadow-sm mb-4">
+    <div class="card-body">
+        <form asp-action="Index" method="get" class="row g-3">
+            <div class="col-md-5">
+                <label class="form-label">Tìm theo mã/tên khách</label>
+                <input type="text" name="searchCode" value="@ViewBag.SearchCode" class="form-control" placeholder="Nhập mã đặt phòng hoặc tên khách" />
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Trạng thái</label>
+                <select name="status" class="form-select">
+                    <option value="">-- Tất cả --</option>
+                    <option value="Pending" selected="@(ViewBag.Status == "Pending")">Chờ xác nhận</option>
+                    <option value="Confirmed" selected="@(ViewBag.Status == "Confirmed")">Đã xác nhận</option>
+                    <option value="Cancelled" selected="@(ViewBag.Status == "Cancelled")">Đã hủy</option>
+                </select>
+            </div>
+            <div class="col-md-3 d-flex align-items-end">
+                <button type="submit" class="btn btn-primary me-2">Lọc</button>
+                <a asp-action="Index" class="btn btn-secondary">Xóa lọc</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="card border-0 shadow-sm">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Mã đặt phòng</th>
+                        <th>Tên khách</th>
+                        <th>Ngày nhận</th>
+                        <th>Ngày trả</th>
+                        <th>Số đêm</th>
+                        <th>Tổng tiền</th>
+                        <th>Trạng thái</th>
+                        <th style="width: 180px;">Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td><strong>@item.BookingCode</strong></td>
+                            <td>@item.GuestName</td>
+                            <td>@item.CheckInDate.ToString("dd/MM/yyyy")</td>
+                            <td>@item.CheckOutDate.ToString("dd/MM/yyyy")</td>
+                            <td>@item.TotalNights</td>
+                            <td>@item.TotalAmount.ToString("N0") đ</td>
+                            <td>
+                                @if (item.Status == "Pending")
+                                {
+                                    <span class="badge bg-warning text-dark">Chờ xác nhận</span>
+                                }
+                                else if (item.Status == "Confirmed")
+                                {
+                                    <span class="badge bg-success">Đã xác nhận</span>
+                                }
+                                else if (item.Status == "Cancelled")
+                                {
+                                    <span class="badge bg-danger">Đã hủy</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-secondary">@item.Status</span>
+                                }
+                            </td>
+                            <td>
+                                <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-outline-info">Chi tiết</a>
+                                @if (User.IsInRole("Admin"))
+                                {
+                                    <button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteModal" data-id="@item.Id" data-name="@item.BookingCode">Xóa</button>
+                                }
+                            </td>
+                        </tr>
+                    }
+                    @if (!Model.Any())
+                    {
+                        <tr>
+                            <td colspan="8" class="text-center text-muted">Không tìm thấy đặt phòng nào.</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Xác nhận xóa</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Bạn có chắc chắn muốn xóa đặt phòng <strong id="deleteItemName"></strong> không?</p>
+            </div>
+            <div class="modal-footer">
+                <form id="deleteForm" method="post">
+                    @Html.AntiForgeryToken()
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="submit" class="btn btn-danger">Xóa</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        var deleteModal = document.getElementById('deleteModal');
+        deleteModal.addEventListener('show.bs.modal', function (event) {
+            var button = event.relatedTarget;
+            var id = button.getAttribute('data-id');
+            var name = button.getAttribute('data-name');
+            
+            document.getElementById('deleteItemName').textContent = name;
+            document.getElementById('deleteForm').action = '@Url.Action("Delete")/' + id;
+        });
+    </script>
+}

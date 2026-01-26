@@ -1,0 +1,124 @@
+@model HotelManagement.Web.DTOs.RoomDto
+@{
+    ViewData["Title"] = "Thêm phòng";
+}
+
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body p-4">
+                <h5 class="mb-4">Thêm phòng mới</h5>
+                
+                <form asp-action="Create" method="post" enctype="multipart/form-data">
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label asp-for="RoomCode" class="form-label"></label>
+                            <input asp-for="RoomCode" class="form-control" />
+                            <span asp-validation-for="RoomCode" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="RoomName" class="form-label"></label>
+                            <input asp-for="RoomName" class="form-control" />
+                            <span asp-validation-for="RoomName" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="RoomTypeId" class="form-label"></label>
+                            <select asp-for="RoomTypeId" class="form-select" asp-items="@ViewBag.RoomTypes">
+                                <option value="">-- Chọn loại phòng --</option>
+                            </select>
+                            <span asp-validation-for="RoomTypeId" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="PricePerNight" class="form-label"></label>
+                            <input asp-for="PricePerNight" class="form-control price-input" type="number" min="0" placeholder="VNĐ" />
+                            <small class="text-muted d-block mt-1" id="priceDisplay" style="color: #28a745; font-weight: 500;"></small>
+                            <span asp-validation-for="PricePerNight" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="MaxPeople" class="form-label"></label>
+                            <input asp-for="MaxPeople" class="form-control" type="number" />
+                            <span asp-validation-for="MaxPeople" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="Status" class="form-label"></label>
+                            <select asp-for="Status" class="form-select">
+                                <option value="Available">Khả dụng</option>
+                                <option value="Maintenance">Bảo trì</option>
+                            </select>
+                            <span asp-validation-for="Status" class="text-danger small"></span>
+                        </div>
+                        <div class="col-12">
+                            <label asp-for="ImageFile" class="form-label"></label>
+                            <input id="imageInput" asp-for="ImageFile" type="file" class="form-control" accept="image/*" />
+                            <small class="form-text d-block mt-2">Định dạng: JPG, PNG, GIF, WEBP</small>
+                            <span asp-validation-for="ImageFile" class="text-danger small"></span>
+                        </div>
+                        <div id="imagePreview" class="col-12" style="display: none;">
+                            <label class="form-label">Xem trước ảnh</label>
+                            <img id="previewImg" src="" alt="Preview" class="img-thumbnail" style="max-height: 200px; width: auto;" />
+                        </div>
+                        <div class="col-12">
+                            <label asp-for="Description" class="form-label"></label>
+                            <textarea asp-for="Description" class="form-control" rows="3"></textarea>
+                            <span asp-validation-for="Description" class="text-danger small"></span>
+                        </div>
+                        <div class="col-12 form-check">
+                            <input asp-for="IsActive" class="form-check-input" />
+                            <label asp-for="IsActive" class="form-check-label"></label>
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-end gap-2 mt-4">
+                        <a asp-action="Index" class="btn btn-secondary">Hủy</a>
+                        <button type="submit" class="btn btn-primary">Lưu</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="~/Views/Shared/_ValidationScriptsPartial.cshtml" />
+    <script>
+        document.getElementById('imageInput').addEventListener('change', function (e) {
+            const file = e.target.files[0];
+            const preview = document.getElementById('imagePreview');
+            const previewImg = document.getElementById('previewImg');
+            
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (event) {
+                    previewImg.src = event.target.result;
+                    preview.style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            } else {
+                preview.style.display = 'none';
+            }
+        });
+
+        // Format price input as Vietnamese Dong
+        const priceInput = document.querySelector('.price-input');
+        const priceDisplay = document.getElementById('priceDisplay');
+
+        function formatPrice() {
+            if (priceInput.value) {
+                const price = parseInt(priceInput.value);
+                priceDisplay.textContent = 'Giá: ' + new Intl.NumberFormat('vi-VN', {
+                    style: 'currency',
+                    currency: 'VND',
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 0
+                }).format(price);
+            } else {
+                priceDisplay.textContent = '';
+            }
+        }
+
+        priceInput.addEventListener('input', formatPrice);
+        formatPrice(); // Initial format
+    </script>
+}

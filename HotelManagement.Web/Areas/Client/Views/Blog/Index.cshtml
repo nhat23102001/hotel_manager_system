@@ -1,0 +1,177 @@
+@model IEnumerable<HotelManagement.Web.DTOs.BlogDto>
+@{
+    ViewData["Title"] = "Blog";
+    int currentPage = ViewBag.CurrentPage ?? 1;
+    int totalPages = ViewBag.TotalPages ?? 1;
+    string? search = ViewBag.Search as string;
+}
+
+<!-- Hero Area Start-->
+<div class="slider-area hero-bg1 hero-overly">
+    <div class="single-slider slider-height3 d-flex align-items-center">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-xl-7 col-lg-11">
+                    <div class="hero-caption hero-caption3">
+                        <h1>Blog</h1>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!--Hero Area End-->
+
+<!-- Blog Area Start-->
+<section class="blog_area section-padding">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 mb-5 mb-lg-0">
+                <div class="blog_left_sidebar">
+
+                    <!-- <aside class="single_sidebar_widget search_widget mb-4">
+                        <form asp-area="Client" asp-controller="Blog" asp-action="Index" method="get" class="mb-0">
+                            <div class="form-group m-0">
+                                <div class="input-group">
+                                    <input type="text" name="search" class="form-control" placeholder="Tìm kiếm bài viết" value="@search">
+                                    <div class="input-group-append d-flex">
+                                        <button class="boxed-btn2" type="submit">Tìm</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </aside> -->
+
+                    @if (Model != null && Model.Any())
+                    {
+                        foreach (var blog in Model)
+                        {
+                            <article class="blog_item">
+                                <div class="blog_item_img">
+                                    @if (!string.IsNullOrWhiteSpace(blog.Thumbnail) && !string.IsNullOrWhiteSpace(blog.ThumbnailFileName))
+                                    {
+                                        <img class="card-img rounded-0" src="@Url.Action("GetImage", "Image", new { area = "Admin", filename = blog.ThumbnailFileName })" alt="@blog.Title">
+                                    }
+                                    else
+                                    {
+                                        <div class="bg-light d-flex align-items-center justify-content-center" style="height: 280px;">
+                                            <i class="fas fa-image" style="font-size: 48px; color: #c5c5c5;"></i>
+                                        </div>
+                                    }
+
+                                    <a asp-area="Client" asp-controller="Blog" asp-action="Detail" asp-route-slug="@blog.Slug" class="blog_item_date">
+                                        <h3>@((blog.PublishedAt ?? blog.CreatedAt).ToString("dd"))</h3>
+                                        <p>@((blog.PublishedAt ?? blog.CreatedAt).ToString("MMM"))</p>
+                                    </a>
+                                </div>
+                                <div class="blog_details">
+                                    <a class="d-inline-block" asp-area="Client" asp-controller="Blog" asp-action="Detail" asp-route-slug="@blog.Slug">
+                                        <h2 class="blog-head" style="color: #2d2d2d;">@blog.Title</h2>
+                                    </a>
+                                    <p>
+                                        @(blog.Summary ?? (blog.Content != null && blog.Content.Length > 180 ? blog.Content.Substring(0, 180) + "..." : blog.Content))
+                                    </p>
+                                    <ul class="blog-info-link">
+                                        <li><a href="#"><i class="fa fa-user"></i> @(blog.AuthorName ?? "Admin")</a></li>
+                                        <li><span><i class="fa fa-calendar"></i> @((blog.PublishedAt ?? blog.CreatedAt).ToString("dd/MM/yyyy"))</span></li>
+                                    </ul>
+                                </div>
+                            </article>
+                        }
+
+                        @if (totalPages > 1)
+                        {
+                            <nav class="blog-pagination justify-content-center d-flex">
+                                <ul class="pagination">
+                                    <li class="page-item @(currentPage == 1 ? "disabled" : string.Empty)">
+                                        <a class="page-link" aria-label="Previous" asp-area="Client" asp-controller="Blog" asp-action="Index" asp-route-page="@(currentPage - 1)" asp-route-search="@search">
+                                            <i class="ti-angle-left"></i>
+                                        </a>
+                                    </li>
+
+                                    @for (int i = 1; i <= totalPages; i++)
+                                    {
+                                        <li class="page-item @(i == currentPage ? "active" : string.Empty)">
+                                            <a class="page-link" asp-area="Client" asp-controller="Blog" asp-action="Index" asp-route-page="@i" asp-route-search="@search">@i</a>
+                                        </li>
+                                    }
+
+                                    <li class="page-item @(currentPage == totalPages ? "disabled" : string.Empty)">
+                                        <a class="page-link" aria-label="Next" asp-area="Client" asp-controller="Blog" asp-action="Index" asp-route-page="@(currentPage + 1)" asp-route-search="@search">
+                                            <i class="ti-angle-right"></i>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </nav>
+                        }
+                    }
+                    else
+                    {
+                        <div class="alert alert-info">Hiện chưa có bài viết nào được xuất bản.</div>
+                    }
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="blog_right_sidebar">
+                    <aside class="single_sidebar_widget search_widget">
+                        <form asp-area="Client" asp-controller="Blog" asp-action="Index" method="get">
+                            <div class="form-group m-0">
+                                <div class="input-group">
+                                    <input type="text" name="search" class="form-control" placeholder="Tìm kiếm bài viết" value="@search">
+                                    <div class="input-group-append d-flex">
+                                        <button class="boxed-btn2" type="submit">Tìm</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </aside>
+
+                    <aside class="single_sidebar_widget popular_post_widget">
+                        <h3 class="widget_title" style="color: #2d2d2d;">Bài viết gần đây</h3>
+                        @{
+                            var recentBlogs = Model?.OrderByDescending(b => b.PublishedAt ?? b.CreatedAt).Take(5) ?? Enumerable.Empty<HotelManagement.Web.DTOs.BlogDto>();
+                            foreach (var item in recentBlogs)
+                            {
+                                <div class="media post_item">
+                                    @if (!string.IsNullOrWhiteSpace(item.Thumbnail) && !string.IsNullOrWhiteSpace(item.ThumbnailFileName))
+                                    {
+                                        <img src="@Url.Action("GetImage", "Image", new { area = "Admin", filename = item.ThumbnailFileName })" alt="@item.Title" style="width: 80px; height: 80px; object-fit: cover;">
+                                    }
+                                    <div class="media-body">
+                                        <a asp-area="Client" asp-controller="Blog" asp-action="Detail" asp-route-slug="@item.Slug">
+                                            <h3 style="color: #2d2d2d;">@item.Title</h3>
+                                        </a>
+                                        <p>@((item.PublishedAt ?? item.CreatedAt).ToString("dd/MM/yyyy"))</p>
+                                    </div>
+                                </div>
+                            }
+                        }
+                    </aside>
+
+                    <aside class="single_sidebar_widget tag_cloud_widget">
+                        <h4 class="widget_title" style="color: #2d2d2d;">Thẻ</h4>
+                        <ul class="list">
+                            <li><a href="#">khách sạn</a></li>
+                            <li><a href="#">du lịch</a></li>
+                            <li><a href="#">nghỉ dưỡng</a></li>
+                            <li><a href="#">phòng</a></li>
+                            <li><a href="#">dịch vụ</a></li>
+                        </ul>
+                    </aside>
+
+                    <aside class="single_sidebar_widget newsletter_widget">
+                        <h4 class="widget_title" style="color: #2d2d2d;">Newsletter</h4>
+                        <form action="#">
+                            <div class="form-group">
+                                <input type="email" class="form-control" placeholder="Email" required>
+                            </div>
+                            <button class="button rounded-0 primary-bg text-white w-100 btn_1 boxed-btn" type="submit">Subscribe</button>
+                        </form>
+                    </aside>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- Blog Area End -->

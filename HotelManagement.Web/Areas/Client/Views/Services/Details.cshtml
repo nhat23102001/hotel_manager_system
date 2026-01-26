@@ -1,0 +1,71 @@
+@model HotelManagement.Web.DTOs.ServiceDto
+@{
+    ViewData["Title"] = "Chi tiết dịch vụ - " + Model.Name;
+}
+
+<!-- Hero Area Start-->
+<div class="slider-area hero-bg1 hero-overly" style="margin-top: 40px; padding-top: 40px;">
+    <div class="single-slider slider-height3 d-flex align-items-center">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-xl-7 col-lg-11">
+                    <div class="hero-caption hero-caption3">
+                        <h1>Chi tiết dịch vụ</h1>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!--Hero Area End-->
+
+<div class="container py-5" style="margin-top: 10px;">
+    <div class="row mb-4">
+        <div class="col-12">
+            <a asp-action="Index" class="btn btn-secondary btn-sm">
+                <i class="fas fa-arrow-left"></i> Quay lại
+            </a>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-5">
+                    <div class="mb-4">
+                        <span class="badge bg-info" style="font-size: 14px; padding: 8px 12px;">@Model.ServiceTypeName</span>
+                    </div>
+
+                    <h2 class="mb-4">@Model.Name</h2>
+
+                    <div class="row g-4 mb-4">
+                        <div class="col-md-6">
+                            <label class="form-label text-muted fw-bold">Đơn giá</label>
+                            <p class="h4 text-success fw-bold">@Model.UnitPrice.ToString("N0") VNĐ</p>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label text-muted fw-bold">Đơn vị tính</label>
+                            <p class="h5">@(!string.IsNullOrWhiteSpace(Model.Unit) ? Model.Unit : "Không xác định")</p>
+                        </div>
+                    </div>
+
+                    <hr class="my-4" />
+
+                    @if (!string.IsNullOrWhiteSpace(Model.Description))
+                    {
+                        <div class="mb-4">
+                            <label class="form-label text-muted fw-bold">Mô tả</label>
+                            <p class="lead">@Model.Description</p>
+                        </div>
+                    }
+
+                    <div class="d-flex gap-2 mt-5">
+                        <a asp-area="Client" asp-controller="Rooms" asp-action="Index" class="btn btn-primary btn-lg flex-grow-1">
+                            <i class="fas fa-calendar-check"></i> Đặt phòng ngay
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

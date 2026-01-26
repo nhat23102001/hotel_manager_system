@@ -1,0 +1,101 @@
+@using Microsoft.EntityFrameworkCore
+@using System.Security.Claims
+<header>
+    <div class="header-area header-transparent">
+        <div class="main-header">
+            <div class="header-top">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-xl-12">
+                            <div class="d-flex justify-content-between flex-wrap align-items-center">
+                                <div class="header-info-left">
+                                    <ul>
+                                        <li>Gọi chúng tôi: +84 (28) 3914 5456</li>
+                                        @{
+                                            var isAuthenticated = User?.Identity?.IsAuthenticated ?? false;
+                                            var displayName = User?.Identity?.Name;
+                                        }
+                                        @if (isAuthenticated && !string.IsNullOrEmpty(displayName))
+                                        {
+                                            <li><i class="fas fa-user"></i> <span class="user-welcome-text">Xin chào, <strong>@displayName</strong></span></li>
+                                        }
+                                        else
+                                        {
+                                            <li><a href="mailto:info@hotelmanagement.vn">info@hotelmanagement.vn</a></li>
+                                        }
+                                    </ul>
+                                </div>
+                                <div class="header-info-right d-flex align-items-center">
+                                    <ul class="header-social d-none d-sm-block me-3">
+                                        <li><a href="#"><i class="fab fa-facebook"></i></a></li>
+                                        <li><a href="#"><i class="fab fa-twitter"></i></a></li>
+                                        <li><a href="#"><i class="fab fa-linkedin-in"></i></a></li>
+                                    </ul>
+                                    @if (isAuthenticated)
+                                    {
+                                        <a asp-area="Client" asp-controller="Profile" asp-action="Index" class="btn btn-link text-white text-decoration-none d-none d-lg-inline me-2" title="Thông tin cá nhân">
+                                            <i class="fas fa-user-circle"></i> Hồ sơ
+                                        </a>
+                                        <form asp-area="Client" asp-controller="Auth" asp-action="Logout" method="post" class="d-inline">
+                                            <button type="submit" class="btn btn-link text-white text-decoration-none d-none d-lg-block" style="border: none; background: transparent;">
+                                                <i class="fas fa-sign-out-alt"></i> Đăng xuất
+                                            </button>
+                                        </form>
+                                    }
+                                    else
+                                    {
+                                        <a asp-area="Client" asp-controller="Auth" asp-action="Login" class="btn btn-link text-white text-decoration-none d-none d-lg-block">
+                                            <i class="fas fa-sign-in-alt"></i> Đăng nhập
+                                        </a>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="header-bottom header-sticky">
+                <div class="container-fluid">
+                    <div class="d-flex align-items-center justify-content-between flex-wrap">
+                        <!-- Logo -->
+                        <div class="logo">
+                            <a asp-area="Client" asp-controller="Home" asp-action="Index">
+                                <img src="~/assets/img/logo/logo.png" alt="Logo" style="height: 50px;">
+                            </a>
+                        </div>
+
+                        <div class="menu-wrapper d-flex align-items-center">
+                            <!-- Main Menu -->
+                            <div class="main-menu d-none d-lg-block">
+                                <nav>
+                                    <ul id="navigation">
+                                        <li><a asp-area="Client" asp-controller="Home" asp-action="Index">Trang chủ</a></li>
+                                        <li><a asp-area="Client" asp-controller="Rooms" asp-action="Index">Phòng</a></li>
+                                        <li><a asp-area="Client" asp-controller="Services" asp-action="Index">Dịch vụ</a></li>
+                                        <li><a asp-area="Client" asp-controller="Blog" asp-action="Index">Tin tức</a></li>
+                                        <li><a asp-area="Client" asp-controller="Contact" asp-action="Index">Liên hệ</a></li>
+                                        @if (isAuthenticated)
+                                        {
+                                            <li><a asp-area="Client" asp-controller="Bookings" asp-action="MyBookings">Tra cứu đặt phòng</a></li>
+                                        }
+                                    </ul>
+                                </nav>
+                            </div>
+
+                            <!-- Header Right Buttons -->
+                            <div class="header-right-btn f-right d-flex align-items-center">
+                                <a asp-area="Client" asp-controller="Rooms" asp-action="Index" class="header-btn2 d-none d-lg-block">Đặt phòng</a>
+                            </div>
+                        </div>
+
+                        <!-- Mobile Menu -->
+                        <div class="col-12">
+                            <div class="mobile_menu d-block d-lg-none"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>

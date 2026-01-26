@@ -1,0 +1,102 @@
+@model HotelManagement.Web.DTOs.ContactDto
+@{
+    ViewData["Title"] = "Chi tiết liên hệ";
+}
+
+<div class="row justify-content-center">
+    <div class="col-lg-10">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h4 class="mb-0">Chi tiết liên hệ</h4>
+            <a asp-action="Index" class="btn btn-secondary">Quay lại</a>
+        </div>
+
+        @if (TempData["Success"] != null)
+        {
+            <div class="alert alert-success alert-dismissible fade show">
+                @TempData["Success"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        }
+
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-body p-4">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label text-muted">Người gửi</label>
+                        <p class="fw-bold">@Model.Name</p>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label text-muted">Email</label>
+                        <p class="fw-bold">@Model.Email</p>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label text-muted">Trạng thái</label>
+                        <p>
+                            @if (Model.Status == "Replied")
+                            {
+                                <span class="badge bg-success">Đã phản hồi</span>
+                            }
+                            else if (Model.Status == "Closed")
+                            {
+                                <span class="badge bg-secondary">Đã đóng</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-warning text-dark">Mới</span>
+                            }
+                        </p>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label text-muted">Ngày gửi</label>
+                        <p class="fw-bold">@Model.CreatedAt.ToString("dd/MM/yyyy HH:mm")</p>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label text-muted">Ngày phản hồi</label>
+                        <p class="fw-bold">@(Model.RepliedAt.HasValue ? Model.RepliedAt.Value.ToString("dd/MM/yyyy HH:mm") : "-")</p>
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label text-muted">Nội dung</label>
+                        <div class="border rounded p-3" style="white-space: pre-wrap;">@Model.Message</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card border-0 shadow-sm">
+            <div class="card-body p-4">
+                <h5 class="mb-3">Phản hồi</h5>
+                <div class="mb-3">
+                    <label class="form-label text-muted">Người phản hồi</label>
+                    <p class="fw-bold">@(Model.RepliedByName ?? "-")</p>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label text-muted">Nội dung phản hồi</label>
+                    <div class="border rounded p-3" style="white-space: pre-wrap;">@(string.IsNullOrWhiteSpace(Model.ReplyContent) ? "Chưa phản hồi" : Model.ReplyContent)</div>
+                </div>
+
+                @if (User.IsInRole("Admin"))
+                {
+                    <form asp-action="Reply" method="post" class="row g-3">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="id" value="@Model.Id" />
+                        <div class="col-12">
+                            <label class="form-label">Nội dung phản hồi</label>
+                            <textarea name="replyContent" class="form-control" rows="3" placeholder="Nhập nội dung phản hồi">@Model.ReplyContent</textarea>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Trạng thái</label>
+                            <select name="status" class="form-select">
+                                <option value="Replied" selected="@(Model.Status == "Replied")">Đã phản hồi</option>
+                                <option value="Closed" selected="@(Model.Status == "Closed")">Đã đóng</option>
+                                <option value="New" selected="@(string.IsNullOrWhiteSpace(Model.Status) || Model.Status == "New")">Mới</option>
+                            </select>
+                        </div>
+                        <div class="col-12">
+                            <button type="submit" class="btn btn-primary">Lưu phản hồi</button>
+                        </div>
+                    </form>
+                }
+            </div>
+        </div>
+    </div>
+</div>

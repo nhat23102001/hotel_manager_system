@@ -1,0 +1,218 @@
+@model IEnumerable<HotelManagement.Web.DTOs.ServiceDto>
+@{
+    ViewData["Title"] = "Danh sách dịch vụ";
+}
+
+<!-- Hero Area Start-->
+<div class="slider-area hero-bg1 hero-overly" style="margin-top: 40px; padding-top: 40px;">
+    <div class="single-slider slider-height3 d-flex align-items-center">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-xl-7 col-lg-11">
+                    <div class="hero-caption hero-caption3">
+                        <h1>Danh sách dịch vụ</h1>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!--Hero Area End-->
+
+<!-- Filter and Services Section -->
+<div class="container py-5" style="margin-top: 10px;">
+    <!-- Filter Section -->
+    <div class="mb-5">
+        <div class="row mb-3">
+            <div class="col-12">
+                <h4 class="fw-bold mb-0">Tìm kiếm dịch vụ</h4>
+            </div>
+        </div>
+        <form method="get">
+            <div class="row g-3 align-items-end">
+                <!-- Search Input -->
+                <div class="col-lg-4 col-md-6">
+                    <label class="form-label fw-bold mb-2">
+                        <i class="fas fa-search"></i> Tìm kiếm
+                    </label>
+                    <input type="text" name="search" value="@ViewBag.Search" class="form-control" style="height: 48px;" placeholder="Tên hoặc mô tả dịch vụ" />
+                </div>
+
+                <!-- Service Type Filter -->
+                <div class="col-lg-4 col-md-6">
+                    <label class="form-label fw-bold mb-2">
+                        <i class="fas fa-cogs"></i> Loại dịch vụ
+                    </label>
+                    <select name="serviceTypeId" class="form-select" style="height: 48px;">
+                        <option value="">-- Chọn Loại Dịch Vụ --</option>
+                        @foreach (var st in (IEnumerable<SelectListItem>)ViewBag.ServiceTypes)
+                        {
+                            <option value="@st.Value" selected="@(st.Value == ViewBag.ServiceTypeId?.ToString())">@st.Text</option>
+                        }
+                    </select>
+                </div>
+
+                <!-- Buttons -->
+                <div class="col-lg-4 col-md-6">
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary flex-grow-1" style="height: 48px;">
+                            <i class="fas fa-filter"></i> Lọc
+                        </button>
+                        <a href="@Url.Action("Index")" class="btn btn-outline-secondary flex-grow-1" style="height: 48px;">
+                            <i class="fas fa-redo"></i> Xóa
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- Services Grid -->
+    <div class="row g-4">
+        @if (Model.Any())
+        {
+            @foreach (var service in Model)
+            {
+                <div class="col-md-6 col-lg-4">
+                    <div class="card h-100 shadow-sm border-0">
+                        <div class="card-body d-flex flex-column">
+                            <div class="mb-3">
+                                <span class="badge bg-info">@service.ServiceTypeName</span>
+                            </div>
+
+                            <h5 class="card-title fw-bold mb-2">@service.Name</h5>
+
+                            @if (!string.IsNullOrWhiteSpace(service.Description))
+                            {
+                                <p class="card-text text-muted small mb-3">@service.Description</p>
+                            }
+
+                            <hr class="my-2" />
+
+                            <div class="mt-auto">
+                                <div class="mb-3">
+                                    <h6 class="text-success fw-bold mb-0">
+                                        <span style="font-size: 18px;">@service.UnitPrice.ToString("N0")</span>
+                                        <span style="font-size: 12px;"> VNĐ@(!string.IsNullOrWhiteSpace(service.Unit) ? "/" + service.Unit : "")</span>
+                                    </h6>
+                                </div>
+                                <a asp-action="Details" asp-route-id="@service.Id" class="btn btn-outline-primary btn-sm w-100">
+                                    <i class="fas fa-eye"></i> Xem chi tiết
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+        else
+        {
+            <div class="col-12">
+                <div class="alert alert-info text-center py-4">
+                    <i class="fas fa-search" style="font-size: 40px; margin-bottom: 15px; display: block;"></i>
+                    <h5>Không tìm thấy dịch vụ</h5>
+                    <p class="mb-0">Vui lòng thử thay đổi điều kiện lọc tìm kiếm.</p>
+                </div>
+            </div>
+        }
+    </div>
+
+    <!-- Pagination -->
+    @{
+        int currentPage = ViewBag.CurrentPage ?? 1;
+        int totalPages = ViewBag.TotalPages ?? 1;
+        int totalServices = ViewBag.TotalServices ?? 0;
+    }
+
+    @if (totalPages > 1)
+    {
+        <nav aria-label="Page navigation" class="mt-5">
+            <ul class="pagination justify-content-center">
+                <!-- Previous Page -->
+                @if (currentPage > 1)
+                {
+                    <li class="page-item">
+                        <a class="page-link" asp-action="Index" asp-route-page="@(currentPage - 1)" 
+                           asp-route-search="@ViewBag.Search" asp-route-serviceTypeId="@ViewBag.ServiceTypeId">
+                            <i class="fas fa-chevron-left"></i> Trước
+                        </a>
+                    </li>
+                }
+                else
+                {
+                    <li class="page-item disabled">
+                        <span class="page-link"><i class="fas fa-chevron-left"></i> Trước</span>
+                    </li>
+                }
+
+                <!-- Page Numbers -->
+                @{
+                    int startPage = Math.Max(1, currentPage - 2);
+                    int endPage = Math.Min(totalPages, currentPage + 2);
+
+                    if (startPage > 1)
+                    {
+                        <li class="page-item">
+                            <a class="page-link" asp-action="Index" asp-route-page="1"
+                               asp-route-search="@ViewBag.Search" asp-route-serviceTypeId="@ViewBag.ServiceTypeId">1</a>
+                        </li>
+                        if (startPage > 2)
+                        {
+                            <li class="page-item disabled"><span class="page-link">...</span></li>
+                        }
+                    }
+
+                    for (int i = startPage; i <= endPage; i++)
+                    {
+                        if (i == currentPage)
+                        {
+                            <li class="page-item active">
+                                <span class="page-link">@i <span class="sr-only">(current)</span></span>
+                            </li>
+                        }
+                        else
+                        {
+                            <li class="page-item">
+                                <a class="page-link" asp-action="Index" asp-route-page="@i"
+                                   asp-route-search="@ViewBag.Search" asp-route-serviceTypeId="@ViewBag.ServiceTypeId">@i</a>
+                            </li>
+                        }
+                    }
+
+                    if (endPage < totalPages)
+                    {
+                        if (endPage < totalPages - 1)
+                        {
+                            <li class="page-item disabled"><span class="page-link">...</span></li>
+                        }
+                        <li class="page-item">
+                            <a class="page-link" asp-action="Index" asp-route-page="@totalPages"
+                               asp-route-search="@ViewBag.Search" asp-route-serviceTypeId="@ViewBag.ServiceTypeId">@totalPages</a>
+                        </li>
+                    }
+                }
+
+                <!-- Next Page -->
+                @if (currentPage < totalPages)
+                {
+                    <li class="page-item">
+                        <a class="page-link" asp-action="Index" asp-route-page="@(currentPage + 1)"
+                           asp-route-search="@ViewBag.Search" asp-route-serviceTypeId="@ViewBag.ServiceTypeId">
+                            Sau <i class="fas fa-chevron-right"></i>
+                        </a>
+                    </li>
+                }
+                else
+                {
+                    <li class="page-item disabled">
+                        <span class="page-link">Sau <i class="fas fa-chevron-right"></i></span>
+                    </li>
+                }
+            </ul>
+        </nav>
+
+        <div class="text-center text-muted mt-3">
+            <p>Hiển thị @((currentPage - 1) * 9 + 1) - @Math.Min(currentPage * 9, totalServices) trên @totalServices dịch vụ</p>
+        </div>
+    }
+</div>

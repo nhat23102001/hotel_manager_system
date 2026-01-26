@@ -1,0 +1,197 @@
+@model HotelManagement.Web.Entities.Booking
+@{
+    ViewData["Title"] = "Xác nhận đặt phòng";
+}
+
+<!-- Hero Area Start-->
+<div class="slider-area hero-bg1 hero-overly" style="margin-top: 40px; padding-top: 40px;">
+    <div class="single-slider slider-height3 d-flex align-items-center">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-xl-7 col-lg-11">
+                    <div class="hero-caption hero-caption3">
+                        <h1>Xác nhận đặt phòng</h1>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!--Hero Area End-->
+
+<div class="container py-5" style="margin-top: 10px;">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <!-- Success Message -->
+            <div class="alert alert-success d-flex align-items-center mb-4" role="alert">
+                <i class="bi bi-check-circle-fill me-3" style="font-size: 2rem;"></i>
+                <div>
+                    <h4 class="alert-heading mb-1">Đặt phòng thành công!</h4>
+                    <p class="mb-0">Cảm ơn bạn đã đặt phòng. Chúng tôi sẽ liên hệ với bạn sớm nhất.</p>
+                </div>
+            </div>
+
+            <!-- Booking Details Card -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="bi bi-file-text"></i> Thông tin đặt phòng</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label text-muted">Mã đặt phòng</label>
+                            <p class="fw-bold fs-5 text-primary">@Model.BookingCode</p>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label text-muted">Ngày đặt</label>
+                            <p class="fw-bold">@Model.BookingDate.ToString("dd/MM/yyyy HH:mm")</p>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label text-muted">Trạng thái</label>
+                            <p>
+                                @if (Model.Status == "Pending")
+                                {
+                                    <span class="badge bg-warning text-dark">Chờ xác nhận</span>
+                                }
+                                else if (Model.Status == "Confirmed")
+                                {
+                                    <span class="badge bg-success">Đã xác nhận</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-secondary">@Model.Status</span>
+                                }
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Guest Information -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-secondary text-white">
+                    <h5 class="mb-0"><i class="bi bi-person"></i> Thông tin khách hàng</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label text-muted">Tên khách hàng</label>
+                            <p class="fw-bold">@Model.GuestName</p>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label text-muted">Số điện thoại</label>
+                            <p class="fw-bold">@Model.PhoneNumber</p>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label text-muted">Email</label>
+                            <p class="fw-bold">@Model.Email</p>
+                        </div>
+                        @if (!string.IsNullOrWhiteSpace(Model.Address))
+                        {
+                            <div class="col-md-6">
+                                <label class="form-label text-muted">Địa chỉ</label>
+                                <p class="fw-bold">@Model.Address</p>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <!-- Room & Dates Information -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0"><i class="bi bi-door-open"></i> Thông tin phòng & thời gian</h5>
+                </div>
+                <div class="card-body">
+                    @foreach (var detail in Model.Details)
+                    {
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label text-muted">Phòng</label>
+                                <p class="fw-bold">@detail.Room.RoomName (@detail.Room.RoomCode)</p>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label text-muted">Giá phòng</label>
+                                <p class="fw-bold">@detail.PricePerNight.ToString("N0") VNĐ/đêm</p>
+                            </div>
+                        </div>
+                    }
+                    <hr />
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label class="form-label text-muted">Ngày nhận phòng</label>
+                            <p class="fw-bold">@Model.CheckInDate.ToString("dd/MM/yyyy")</p>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label text-muted">Ngày trả phòng</label>
+                            <p class="fw-bold">@Model.CheckOutDate.ToString("dd/MM/yyyy")</p>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label text-muted">Số đêm</label>
+                            <p class="fw-bold">@Model.TotalNights đêm</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Payment Summary -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0"><i class="bi bi-calculator"></i> Chi tiết thanh toán</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>Tiền phòng (@Model.TotalNights đêm × @Model.Details.First().PricePerNight.ToString("N0") VNĐ):</span>
+                                <span class="fw-bold">@((Model.Details.First().PricePerNight * Model.TotalNights).ToString("N0")) VNĐ</span>
+                            </div>
+                            @if (Model.Services != null && Model.Services.Any())
+                            {
+                                <div class="mb-2">
+                                    <strong>Dịch vụ đi kèm:</strong>
+                                    @foreach (var service in Model.Services)
+                                    {
+                                        <div class="d-flex justify-content-between ms-3 mb-1">
+                                            <span>• @service.Service?.Name (@service.Quantity @service.Service?.Unit)</span>
+                                            <span>@service.TotalPrice.ToString("N0") VNĐ</span>
+                                        </div>
+                                    }
+                                </div>
+                            }
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>Tạm tính:</span>
+                                <span class="fw-bold">@Model.SubTotal.ToString("N0") VNĐ</span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>VAT (10%):</span>
+                                <span class="fw-bold">@Model.VAT.ToString("N0") VNĐ</span>
+                            </div>
+                            <hr />
+                            <div class="d-flex justify-content-between">
+                                <span class="fs-5 fw-bold">Tổng cộng:</span>
+                                <span class="fs-4 fw-bold text-success">@Model.TotalAmount.ToString("N0") VNĐ</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Actions -->
+            <div class="d-flex gap-2 justify-content-center">
+                <a asp-action="Index" class="btn btn-secondary">
+                    <i class="bi bi-arrow-left"></i> Quay lại danh sách phòng
+                </a>
+                <a asp-area="Client" asp-controller="Home" asp-action="Index" class="btn btn-primary">
+                    <i class="bi bi-house"></i> Về trang chủ
+                </a>
+            </div>
+
+            <!-- Note -->
+            <div class="alert alert-info mt-4" role="alert">
+                <i class="bi bi-info-circle"></i>
+                <strong>Lưu ý:</strong> Vui lòng lưu lại mã đặt phòng <strong>@Model.BookingCode</strong> để tra cứu và liên hệ với chúng tôi khi cần thiết.
+            </div>
+        </div>
+    </div>
+</div>

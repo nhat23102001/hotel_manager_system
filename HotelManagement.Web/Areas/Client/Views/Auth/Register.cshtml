@@ -1,0 +1,91 @@
+@model HotelManagement.Web.DTOs.RegisterRequestDto
+@{
+    ViewData["Title"] = "Đăng ký tài khoản";
+    ViewData["BodyClass"] = "auth-body";
+    Layout = "~/Areas/Client/Views/Shared/_Layout.cshtml";
+}
+
+<!-- Hero Area -->
+<div class="slider-area hero-bg1 hero-overly">
+    <div class="single-slider slider-height3 d-flex align-items-center">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-xl-7 col-lg-11">
+                    <div class="hero-caption hero-caption3">
+                        <h1>Đăng ký</h1>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Auth Form Section -->
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-5 col-md-7">
+            <div class="card shadow border-0 auth-form-card">
+                <div class="card-body p-4 p-md-5">
+                    <div class="text-center mb-4">
+                        <div class="auth-icon mb-3">
+                            <i class="fas fa-user-plus"></i>
+                        </div>
+                        <h4 class="fw-bold mb-1">Tạo tài khoản mới</h4>
+                        <p class="text-muted small">Điền thông tin để đăng ký</p>
+                    </div>
+
+                    @if (TempData["RegisterError"] != null)
+                    {
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            <i class="fas fa-exclamation-circle"></i> @TempData["RegisterError"]
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    }
+
+                    <form asp-area="Client" asp-controller="Auth" asp-action="Register" method="post">
+                        <div class="mb-4">
+                            <label asp-for="Username" class="form-label fw-semibold"><i class="fas fa-user text-primary me-1"></i> Tên đăng nhập</label>
+                            <input asp-for="Username" class="form-control form-control-lg" placeholder="Nhập tên đăng nhập" autocomplete="username" />
+                            <small class="text-muted d-block mt-1">Từ 3-50 ký tự</small>
+                            <span asp-validation-for="Username" class="text-danger d-block mt-1 small"></span>
+                        </div>
+                        <div class="mb-4">
+                            <label asp-for="Password" class="form-label fw-semibold"><i class="fas fa-lock text-primary me-1"></i> Mật khẩu</label>
+                            <input asp-for="Password" class="form-control form-control-lg" placeholder="Nhập mật khẩu" autocomplete="new-password" />
+                            <small class="text-muted d-block mt-1">Tối thiểu 6 ký tự</small>
+                            <span asp-validation-for="Password" class="text-danger d-block mt-1 small"></span>
+                        </div>
+                        <div class="mb-4">
+                            <label asp-for="ConfirmPassword" class="form-label fw-semibold"><i class="fas fa-lock text-primary me-1"></i> Xác nhận mật khẩu</label>
+                            <input asp-for="ConfirmPassword" class="form-control form-control-lg" placeholder="Nhập lại mật khẩu" autocomplete="new-password" />
+                            <span asp-validation-for="ConfirmPassword" class="text-danger d-block mt-1 small"></span>
+                        </div>
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3 small"></div>
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary btn-lg py-3 fw-semibold">
+                                <i class="fas fa-user-plus me-2"></i>Đăng ký
+                            </button>
+                        </div>
+                    </form>
+
+                    <div class="divider my-4">
+                        <span class="text-muted small">hoặc</span>
+                    </div>
+
+                    <div class="text-center">
+                        <p class="mb-0 small text-muted">
+                            Đã có tài khoản? 
+                            <a asp-area="Client" asp-controller="Auth" asp-action="Login" class="text-decoration-none text-primary fw-semibold">
+                                <i class="fas fa-sign-in-alt me-1"></i>Đăng nhập ngay
+                            </a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="~/Views/Shared/_ValidationScriptsPartial.cshtml" />
+}

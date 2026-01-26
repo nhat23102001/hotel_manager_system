@@ -1,0 +1,69 @@
+@model HotelManagement.Web.DTOs.LoginRequestDto
+@{
+    Layout = null; // Trang đăng nhập admin tách riêng, không dùng layout chung
+}
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Đăng nhập quản trị</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <style>
+        body {
+            background: linear-gradient(135deg, #0d6efd 0%, #0b355e 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .login-card {
+            max-width: 420px;
+            width: 100%;
+            border: none;
+            border-radius: 16px;
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-12 col-md-8 col-lg-5">
+                <div class="card login-card">
+                    <div class="card-body p-4 p-md-5">
+                        <div class="text-center mb-4">
+                            <div class="fw-bold text-primary">Hotel Admin</div>
+                            <h4 class="mt-2 mb-1">Đăng nhập quản trị</h4>
+                            <p class="text-muted small mb-0">Chỉ dành cho Admin/Manager</p>
+                        </div>
+
+                        <form asp-area="Admin" asp-controller="Auth" asp-action="Login" method="post" novalidate>
+                            <div class="mb-3">
+                                <label asp-for="Username" class="form-label">Tên đăng nhập</label>
+                                <input asp-for="Username" class="form-control" autocomplete="username" placeholder="Nhập tên đăng nhập" />
+                                <span asp-validation-for="Username" class="text-danger small"></span>
+                            </div>
+                            <div class="mb-3">
+                                <label asp-for="Password" class="form-label">Mật khẩu</label>
+                                <input asp-for="Password" class="form-control" autocomplete="current-password" placeholder="••••••••" />
+                                <span asp-validation-for="Password" class="text-danger small"></span>
+                            </div>
+
+                            <div asp-validation-summary="All" class="text-danger small mb-3"></div>
+
+                            <button type="submit" class="btn btn-primary w-100">Đăng nhập</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <partial name="~/Views/Shared/_ValidationScriptsPartial.cshtml" />
+</body>
+</html>

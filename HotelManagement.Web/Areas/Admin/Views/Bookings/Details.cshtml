@@ -1,0 +1,200 @@
+@model HotelManagement.Web.DTOs.BookingDto
+@{
+    ViewData["Title"] = "Chi tiết đặt phòng";
+    var details = ViewBag.BookingDetails as IEnumerable<HotelManagement.Web.Entities.BookingDetail>;
+    var services = ViewBag.BookingServices as IEnumerable<HotelManagement.Web.Entities.BookingService>;
+}
+
+<div class="row justify-content-center">
+    <div class="col-lg-10">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h4 class="mb-0">Chi tiết đặt phòng</h4>
+            <div class="d-flex gap-2">
+                <a asp-action="Index" class="btn btn-secondary">Quay lại</a>
+                @if (User.IsInRole("Admin") && Model.Status != "Cancelled")
+                {
+                    @if (Model.Status == "Pending")
+                    {
+                        <form asp-action="UpdateStatus" method="post" class="d-inline">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="id" value="@Model.Id" />
+                            <input type="hidden" name="status" value="Confirmed" />
+                            <button type="submit" class="btn btn-success">Xác nhận</button>
+                        </form>
+                    }
+                    <form asp-action="UpdateStatus" method="post" class="d-inline">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="id" value="@Model.Id" />
+                        <input type="hidden" name="status" value="Cancelled" />
+                        <button type="submit" class="btn btn-danger">Hủy đơn</button>
+                    </form>
+                }
+            </div>
+        </div>
+
+        @if (TempData["Success"] != null)
+        {
+            <div class="alert alert-success alert-dismissible fade show">
+                @TempData["Success"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        }
+
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-body p-4">
+                <h5 class="mb-3">Thông tin đặt phòng</h5>
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label text-muted">Mã đặt phòng</label>
+                        <p class="fw-bold">@Model.BookingCode</p>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label text-muted">Trạng thái</label>
+                        <p>
+                            @if (Model.Status == "Pending")
+                            {
+                                <span class="badge bg-warning text-dark">Chờ xác nhận</span>
+                            }
+                            else if (Model.Status == "Confirmed")
+                            {
+                                <span class="badge bg-success">Đã xác nhận</span>
+                            }
+                            else if (Model.Status == "Cancelled")
+                            {
+                                <span class="badge bg-danger">Đã hủy</span>
+                            }
+                        </p>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label text-muted">Ngày đặt</label>
+                        <p class="fw-bold">@Model.BookingDate.ToString("dd/MM/yyyy HH:mm")</p>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label text-muted">Ngày nhận phòng</label>
+                        <p class="fw-bold">@Model.CheckInDate.ToString("dd/MM/yyyy")</p>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label text-muted">Ngày trả phòng</label>
+                        <p class="fw-bold">@Model.CheckOutDate.ToString("dd/MM/yyyy")</p>
+                    </div>
+                </div>
+
+                <hr class="my-4" />
+                <h5 class="mb-3">Thông tin khách hàng</h5>
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label text-muted">Tên khách</label>
+                        <p class="fw-bold">@Model.GuestName</p>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label text-muted">Số điện thoại</label>
+                        <p class="fw-bold">@(Model.PhoneNumber ?? "-")</p>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label text-muted">Email</label>
+                        <p class="fw-bold">@(Model.Email ?? "-")</p>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label text-muted">Tài khoản</label>
+                        <p class="fw-bold">@(Model.Username ?? "-")</p>
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label text-muted">Địa chỉ</label>
+                        <p class="fw-bold">@(Model.Address ?? "-")</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-body p-4">
+                <h5 class="mb-3">Danh sách phòng</h5>
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Mã phòng</th>
+                                <th>Tên phòng</th>
+                                <th>Loại phòng</th>
+                                <th>Giá/đêm</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (details != null)
+                            {
+                                @foreach (var detail in details)
+                                {
+                                    <tr>
+                                        <td>@detail.Room?.RoomCode</td>
+                                        <td>@detail.Room?.RoomName</td>
+                                        <td>@detail.Room?.RoomType?.Name</td>
+                                        <td>@detail.PricePerNight.ToString("N0") đ</td>
+                                    </tr>
+                                }
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        @if (services != null && services.Any())
+        {
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body p-4">
+                    <h5 class="mb-3">Dịch vụ đi kèm</h5>
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Dịch vụ</th>
+                                    <th>Số lượng</th>
+                                    <th>Đơn giá</th>
+                                    <th>Thành tiền</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var service in services)
+                                {
+                                    <tr>
+                                        <td>@service.Service?.Name</td>
+                                        <td>@service.Quantity</td>
+                                        <td>@service.UnitPrice.ToString("N0") đ</td>
+                                        <td>@service.TotalPrice.ToString("N0") đ</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        }
+
+        <div class="card border-0 shadow-sm">
+            <div class="card-body p-4">
+                <h5 class="mb-3">Tổng kết</h5>
+                <div class="row">
+                    <div class="col-md-6 offset-md-6">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Số đêm:</span>
+                            <strong>@Model.TotalNights đêm</strong>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Tạm tính:</span>
+                            <strong>@Model.SubTotal.ToString("N0") đ</strong>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>VAT:</span>
+                            <strong>@Model.VAT.ToString("N0") đ</strong>
+                        </div>
+                        <hr />
+                        <div class="d-flex justify-content-between">
+                            <span class="h5">Tổng cộng:</span>
+                            <strong class="h5 text-primary">@Model.TotalAmount.ToString("N0") đ</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

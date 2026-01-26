@@ -1,0 +1,108 @@
+@model HotelManagement.Web.DTOs.BlogDto
+@{
+    ViewData["Title"] = "Sửa bài viết";
+}
+
+<h4 class="mb-4">Sửa bài viết</h4>
+
+<div class="card border-0 shadow-sm">
+    <div class="card-body">
+        <form asp-action="Edit" method="post" class="row g-3" enctype="multipart/form-data">
+            @Html.AntiForgeryToken()
+            <input type="hidden" asp-for="Id" />
+            <input type="hidden" asp-for="Thumbnail" />
+            <div class="col-md-8">
+                <label asp-for="Title" class="form-label"></label>
+                <input asp-for="Title" class="form-control" />
+                <span asp-validation-for="Title" class="text-danger"></span>
+            </div>
+            <div class="col-md-4">
+                <label asp-for="Slug" class="form-label"></label>
+                <input asp-for="Slug" class="form-control" />
+                <span asp-validation-for="Slug" class="text-danger"></span>
+            </div>
+            <div class="col-12">
+                <label asp-for="Summary" class="form-label"></label>
+                <textarea asp-for="Summary" class="form-control" rows="2"></textarea>
+                <span asp-validation-for="Summary" class="text-danger"></span>
+            </div>
+            <div class="col-12">
+                <label asp-for="Content" class="form-label"></label>
+                <textarea asp-for="Content" class="form-control" rows="6"></textarea>
+                <span asp-validation-for="Content" class="text-danger"></span>
+            </div>
+            @if (!string.IsNullOrWhiteSpace(Model.Thumbnail) && !string.IsNullOrWhiteSpace(Model.ThumbnailFileName))
+            {
+                <div class="col-12">
+                    <p class="text-muted mb-2">Ảnh đại diện hiện tại</p>
+                    <img src="@Url.Action("GetImage", "Image", new { filename = Model.ThumbnailFileName })" alt="Thumbnail" class="img-thumbnail" style="max-width: 300px; max-height: 200px;" />
+                </div>
+            }
+            <div class="col-12">
+                <label asp-for="ThumbnailFile" class="form-label"></label>
+                <input id="thumbnailInput" asp-for="ThumbnailFile" type="file" class="form-control" accept="image/*" />
+                <span asp-validation-for="ThumbnailFile" class="text-danger"></span>
+                <small class="text-muted d-block mt-2">Chọn ảnh mới để thay đổi (tùy chọn)</small>
+            </div>
+            <div id="thumbnailPreview" class="col-12" style="display: none;">
+                <div class="card border-0 shadow-sm p-3">
+                    <p class="text-muted mb-2">Xem trước ảnh đại diện mới</p>
+                    <img id="previewImg" src="" alt="Preview" class="img-thumbnail" style="max-width: 300px; max-height: 200px;" />
+                </div>
+            </div>
+            <div class="col-md-4">
+                <label asp-for="PublishedAt" class="form-label"></label>
+                <input asp-for="PublishedAt" type="datetime-local" class="form-control" />
+                <span asp-validation-for="PublishedAt" class="text-danger"></span>
+            </div>
+            <div class="col-md-4 d-flex align-items-center">
+                <div class="form-check mt-3">
+                    <input asp-for="IsPublished" class="form-check-input" />
+                    <label asp-for="IsPublished" class="form-check-label"></label>
+                </div>
+            </div>
+            <div class="col-12">
+                <a asp-action="Index" class="btn btn-secondary">Quay lại</a>
+                <button type="submit" class="btn btn-primary">Lưu</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        document.getElementById('thumbnailInput').addEventListener('change', function (e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (event) {
+                    document.getElementById('previewImg').src = event.target.result;
+                    document.getElementById('thumbnailPreview').style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // Auto generate slug and focus
+        document.getElementById('Title').addEventListener('blur', function () {
+            const titleInput = this;
+            const slugInput = document.getElementById('Slug');
+            
+            if (titleInput.value.trim() && !slugInput.value.trim()) {
+                // Auto generate slug from title - remove Vietnamese diacritics
+                const slug = titleInput.value
+                    .toLowerCase()
+                    .trim()
+                    .normalize('NFD')
+                    .replace(/[\u0300-\u036f]/g, '') // Remove diacritics
+                    .replace(/\s+/g, '-')
+                    .replace(/[^\w-]+/g, '');
+                slugInput.value = slug.length > 200 ? slug.substring(0, 200) : slug;
+                
+                // Auto focus to slug
+                slugInput.focus();
+            }
+        });
+    </script>
+}

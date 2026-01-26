@@ -1,0 +1,72 @@
+@model HotelManagement.Web.DTOs.AccountManagementDto
+@{
+    ViewData["Title"] = "Chi tiết tài khoản";
+}
+
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body p-4">
+                <h5 class="mb-4">Chi tiết tài khoản</h5>
+
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label text-muted">Tên đăng nhập</label>
+                        <p class="fw-bold">@Model.Username</p>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label text-muted">Vai trò</label>
+                        <p>
+                            @if (Model.Role == "Admin")
+                            {
+                                <span class="badge bg-danger">Admin</span>
+                            }
+                            else if (Model.Role == "Manager")
+                            {
+                                <span class="badge bg-info">Manager</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-warning text-dark">Client</span>
+                            }
+                        </p>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label text-muted">Họ tên</label>
+                        <p class="fw-bold">@(Model.FullName ?? "-")</p>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label text-muted">Email</label>
+                        <p class="fw-bold">@(Model.Email ?? "-")</p>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label text-muted">Số điện thoại</label>
+                        <p class="fw-bold">@(Model.PhoneNumber ?? "-")</p>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label text-muted">Trạng thái</label>
+                        <p>
+                            @if (Model.IsActive)
+                            {
+                                <span class="badge bg-success">Kích hoạt</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-secondary">Khóa</span>
+                            }
+                        </p>
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label text-muted">Địa chỉ</label>
+                        <p class="fw-bold">@(Model.Address ?? "-")</p>
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-end gap-2 mt-4">
+                    <a asp-action="Index" class="btn btn-secondary">Quay lại</a>
+                    <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary">Sửa</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

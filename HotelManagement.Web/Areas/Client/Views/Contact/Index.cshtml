@@ -1,0 +1,105 @@
+@model HotelManagement.Web.DTOs.ContactDto
+@{
+    ViewData["Title"] = "Liên hệ";
+}
+
+<!-- Hero Area Start -->
+<div class="slider-area hero-bg1 hero-overly">
+    <div class="single-slider slider-height3 d-flex align-items-center">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-xl-7 col-lg-9">
+                    <div class="hero-caption hero-caption3 text-center">
+                        <h1>Liên hệ với chúng tôi</h1>
+                        <p>Chúng tôi luôn sẵn sàng hỗ trợ mọi thắc mắc của bạn.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Hero Area End -->
+
+<section class="contact-section section-padding">
+    <div class="container">
+        <div class="row mb-5">
+            <div class="col-lg-4">
+                <div class="contact-info mb-4">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="contact-info__icon"><i class="fas fa-map-marker-alt"></i></div>
+                        <div class="media-body">
+                            <h3>123 Đường Lê Lợi, Quận 1</h3>
+                            <p>TP. Hồ Chí Minh</p>
+                        </div>
+                    </div>
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="contact-info__icon"><i class="fas fa-phone-alt"></i></div>
+                        <div class="media-body">
+                            <h3><a href="tel:+842839145456">+84 (28) 3914 5456</a></h3>
+                            <p>Thứ 2 - Thứ 7, 8:00 - 22:00</p>
+                        </div>
+                    </div>
+                    <div class="d-flex align-items-center">
+                        <div class="contact-info__icon"><i class="far fa-envelope"></i></div>
+                        <div class="media-body">
+                            <h3><a href="mailto:info@hotelmanagement.vn">info@hotelmanagement.vn</a></h3>
+                            <p>Chúng tôi sẽ phản hồi trong giờ làm việc.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-8">
+                <div class="contact-title mb-20">
+                    <h2>Gửi tin nhắn</h2>
+                    <p>Điền thông tin của bạn, chúng tôi sẽ sớm liên hệ lại.</p>
+                </div>
+
+                @if (TempData["ContactSuccess"] != null)
+                {
+                    <div class="alert alert-success" role="alert">
+                        @TempData["ContactSuccess"]
+                    </div>
+                }
+
+                <form asp-area="Client" asp-controller="Contact" asp-action="Index" method="post" class="form-contact contact_form" id="contactForm" novalidate>
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label asp-for="Name" class="form-label"></label>
+                                <input asp-for="Name" class="form-control" placeholder="Tên của bạn" />
+                                <span asp-validation-for="Name" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label asp-for="Email" class="form-label"></label>
+                                <input asp-for="Email" class="form-control" placeholder="Email" />
+                                <span asp-validation-for="Email" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="form-group">
+                                <label asp-for="Message" class="form-label"></label>
+                                <textarea asp-for="Message" class="form-control w-100" rows="6" placeholder="Nội dung cần hỗ trợ"></textarea>
+                                <span asp-validation-for="Message" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group mt-3">
+                        <button type="submit" class="button button-contactForm btn_1 boxed-btn">Gửi thông tin</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-12">
+                <div class="map" style="height: 320px; border-radius: 12px; overflow: hidden;">
+                    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3919.5022325442765!2d106.6991503153342!3d10.773374692321974!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x31752f48e34c2b19%3A0x9f671aa43e76e886!2zMTIzIMSQLiBMw6ogTOG7o2ksIFF14bqtbiAxLCBRdeG6rW4gMSwgVMO+IFAuIEjhu5MgQ2jDrSBOaW5o!5e0!3m2!1svi!2s!4v1600000000000!5m2!1svi!2s" width="100%" height="100%" frameborder="0" style="border:0;" allowfullscreen="" aria-hidden="false" tabindex="0"></iframe>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

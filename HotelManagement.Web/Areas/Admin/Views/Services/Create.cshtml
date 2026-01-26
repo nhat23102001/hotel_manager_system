@@ -1,0 +1,55 @@
+@model HotelManagement.Web.DTOs.ServiceDto
+@using Microsoft.AspNetCore.Mvc.Rendering
+@{
+    ViewData["Title"] = "Thêm dịch vụ";
+    var serviceTypes = ViewBag.ServiceTypes as List<SelectListItem>;
+}
+
+<h4 class="mb-4">Thêm dịch vụ</h4>
+
+<div class="card border-0 shadow-sm">
+    <div class="card-body">
+        <form asp-action="Create" method="post" class="row g-3">
+            @Html.AntiForgeryToken()
+            <div class="col-md-6">
+                <label asp-for="ServiceTypeId" class="form-label"></label>
+                <select asp-for="ServiceTypeId" class="form-select" asp-items="serviceTypes"></select>
+                <span asp-validation-for="ServiceTypeId" class="text-danger"></span>
+            </div>
+            <div class="col-md-6">
+                <label asp-for="Name" class="form-label"></label>
+                <input asp-for="Name" class="form-control" placeholder="Nhập tên dịch vụ" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+            <div class="col-md-4">
+                <label asp-for="UnitPrice" class="form-label"></label>
+                <input asp-for="UnitPrice" class="form-control" />
+                <span asp-validation-for="UnitPrice" class="text-danger"></span>
+            </div>
+            <div class="col-md-4">
+                <label asp-for="Unit" class="form-label"></label>
+                <input asp-for="Unit" class="form-control" placeholder="VD: giờ, combo, suất" />
+                <span asp-validation-for="Unit" class="text-danger"></span>
+            </div>
+            <div class="col-md-4 d-flex align-items-center">
+                <div class="form-check mt-3">
+                    <input asp-for="IsActive" class="form-check-input" />
+                    <label asp-for="IsActive" class="form-check-label"></label>
+                </div>
+            </div>
+            <div class="col-12">
+                <label asp-for="Description" class="form-label"></label>
+                <textarea asp-for="Description" class="form-control" rows="3" placeholder="Mô tả ngắn"></textarea>
+                <span asp-validation-for="Description" class="text-danger"></span>
+            </div>
+            <div class="col-12">
+                <a asp-action="Index" class="btn btn-secondary">Quay lại</a>
+                <button type="submit" class="btn btn-primary">Lưu</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

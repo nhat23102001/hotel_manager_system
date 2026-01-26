@@ -1,0 +1,248 @@
+@model IEnumerable<HotelManagement.Web.DTOs.RoomDto>
+@{
+    ViewData["Title"] = "Danh sách phòng";
+}
+
+<!-- Hero Area Start-->
+<div class="slider-area hero-bg1 hero-overly" style="margin-top: 40px; padding-top: 40px;">
+    <div class="single-slider slider-height3 d-flex align-items-center">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-xl-7 col-lg-11">
+                    <div class="hero-caption hero-caption3">
+                        <h1>Danh sách phòng</h1>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!--Hero Area End-->
+
+<!-- Filter and Rooms Section -->
+<div class="container py-5" style="margin-top: 10px;">
+    <!-- Filter Section -->
+    <div class="card mb-4 shadow-sm">
+        <div class="card-body">
+            <h5 class="mb-3"><i class="fas fa-search"></i> Tìm phòng phù hợp</h5>
+            <form method="get" class="row g-3">
+                <!-- Check-in Date -->
+                <div class="col-md-3">
+                    <label class="form-label fw-bold"><i class="fas fa-calendar-check text-success"></i> Ngày nhận phòng</label>
+                    <input type="date" name="checkInDate" value="@ViewBag.CheckInDate" class="form-control form-control-lg" min="@DateTime.Today.ToString("yyyy-MM-dd")" />
+                </div>
+                
+                <!-- Check-out Date -->
+                <div class="col-md-3">
+                    <label class="form-label fw-bold"><i class="fas fa-calendar-times text-danger"></i> Ngày trả phòng</label>
+                    <input type="date" name="checkOutDate" value="@ViewBag.CheckOutDate" class="form-control form-control-lg" min="@DateTime.Today.AddDays(1).ToString("yyyy-MM-dd")" />
+                </div>
+
+                <!-- Search -->
+                <div class="col-md-3">
+                    <label class="form-label fw-bold"><i class="fas fa-search"></i> Tìm kiếm</label>
+                    <input type="text" name="search" value="@ViewBag.Search" class="form-control form-control-lg" placeholder="Mã hoặc tên phòng" />
+                </div>
+                
+                <!-- Room Type -->
+                <div class="col-md-3">
+                    <label class="form-label fw-bold"><i class="fas fa-door-open"></i> Loại phòng</label>
+                    <select name="roomTypeId" class="form-select form-select-lg">
+                        <option value="">-- Chọn loại phòng --</option>
+                        @foreach (var rt in (IEnumerable<SelectListItem>)ViewBag.RoomTypes)
+                        {
+                            <option value="@rt.Value" selected="@(rt.Value == ViewBag.RoomTypeId?.ToString())">@rt.Text</option>
+                        }
+                    </select>
+                </div>
+                
+                <!-- Min Price -->
+                <div class="col-md-2">
+                    <label class="form-label fw-bold"><i class="fas fa-money-bill"></i> Giá từ (VNĐ)</label>
+                    <input type="number" name="minPrice" value="@ViewBag.MinPrice" class="form-control form-control-lg" placeholder="Tối thiểu" />
+                </div>
+                
+                <!-- Max Price -->
+                <div class="col-md-2">
+                    <label class="form-label fw-bold"><i class="fas fa-money-bill"></i> Giá đến (VNĐ)</label>
+                    <input type="number" name="maxPrice" value="@ViewBag.MaxPrice" class="form-control form-control-lg" placeholder="Tối đa" />
+                </div>
+
+                <!-- Buttons -->
+                <div class="col-md-4 d-flex gap-2 align-items-end">
+                    <button type="submit" class="btn btn-primary btn-lg flex-grow-1">
+                        <i class="fas fa-filter"></i> Tìm phòng
+                    </button>
+                    <a href="@Url.Action("Index")" class="btn btn-outline-secondary btn-lg flex-grow-1">
+                        <i class="fas fa-redo"></i> Xóa lọc
+                    </a>
+                </div>
+            </form>
+
+            @if (!string.IsNullOrWhiteSpace(ViewBag.CheckInDate) && !string.IsNullOrWhiteSpace(ViewBag.CheckOutDate))
+            {
+                <div class="alert alert-info mt-3 mb-0">
+                    <i class="fas fa-info-circle"></i> 
+                    Hiển thị phòng <strong>còn trống</strong> từ <strong>@DateTime.Parse(ViewBag.CheckInDate).ToString("dd/MM/yyyy")</strong> đến <strong>@DateTime.Parse(ViewBag.CheckOutDate).ToString("dd/MM/yyyy")</strong>
+                </div>
+            }
+        </div>
+    </div>
+
+    <!-- Rooms Grid -->
+    <div class="row g-4">
+        @if (Model.Any())
+        {
+            @foreach (var room in Model)
+            {
+                <div class="col-md-6 col-lg-4">
+                    <div class="card h-100 shadow-sm position-relative">
+                        <div style="position: relative; overflow: hidden;">
+                            @if (!string.IsNullOrWhiteSpace(room.ImageUrl) && !string.IsNullOrWhiteSpace(room.ImageFileName))
+                            {
+                                <img src="@Url.Action("GetImage", "Image", new { area = "Admin", filename = room.ImageFileName })" 
+                                     alt="@room.RoomName" class="card-img-top" style="height: 200px; object-fit: cover;" />
+                            }
+                            else
+                            {
+                                <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 200px;">
+                                    <span class="text-muted">Chưa có ảnh</span>
+                                </div>
+                            }
+                            <span class="badge bg-success" style="position: absolute; top: 10px; right: 10px; font-size: 12px; padding: 6px 10px;">Khả dụng</span>
+                        </div>
+                        <div class="card-body">
+                            <h5 class="card-title fw-bold">@room.RoomName</h5>
+                            <p class="card-text text-muted small">Mã: <strong>@room.RoomCode</strong></p>
+                            <p class="card-text text-muted small">Loại: <strong>@room.RoomType</strong></p>
+                            <p class="card-text text-muted small">Tối đa: <strong>@room.MaxPeople người</strong></p>
+                            <h6 class="text-success mb-3">
+                                <strong>@room.PricePerNight.ToString("N0") VNĐ</strong>/đêm
+                            </h6>
+                            <a asp-action="Details" asp-route-id="@room.Id" class="btn btn-outline-primary btn-sm w-100">
+                                Xem chi tiết
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+        else
+        {
+            <div class="col-12">
+                <div class="alert alert-info">
+                    Không tìm thấy phòng phù hợp với điều kiện lọc.
+                </div>
+            </div>
+        }
+    </div>
+
+    <!-- Pagination -->
+    @{
+        int currentPage = ViewBag.CurrentPage ?? 1;
+        int totalPages = ViewBag.TotalPages ?? 1;
+        int totalRooms = ViewBag.TotalRooms ?? 0;
+    }
+
+    @if (totalPages > 1)
+    {
+        <nav aria-label="Page navigation" class="mt-5">
+            <ul class="pagination justify-content-center">
+                <!-- Previous Page -->
+                @if (currentPage > 1)
+                {
+                    <li class="page-item">
+                        <a class="page-link" asp-action="Index" asp-route-page="@(currentPage - 1)" 
+                           asp-route-search="@ViewBag.Search" asp-route-roomTypeId="@ViewBag.RoomTypeId"
+                           asp-route-minPrice="@ViewBag.MinPrice" asp-route-maxPrice="@ViewBag.MaxPrice"
+                           asp-route-checkInDate="@ViewBag.CheckInDate" asp-route-checkOutDate="@ViewBag.CheckOutDate">
+                            <i class="fas fa-chevron-left"></i> Trước
+                        </a>
+                    </li>
+                }
+                else
+                {
+                    <li class="page-item disabled">
+                        <span class="page-link"><i class="fas fa-chevron-left"></i> Trước</span>
+                    </li>
+                }
+
+                <!-- Page Numbers -->
+                @{
+                    int startPage = Math.Max(1, currentPage - 2);
+                    int endPage = Math.Min(totalPages, currentPage + 2);
+
+                    if (startPage > 1)
+                    {
+                        <li class="page-item">
+                            <a class="page-link" asp-action="Index" asp-route-page="1"
+                               asp-route-search="@ViewBag.Search" asp-route-roomTypeId="@ViewBag.RoomTypeId"
+                               asp-route-minPrice="@ViewBag.MinPrice" asp-route-maxPrice="@ViewBag.MaxPrice"
+                               asp-route-checkInDate="@ViewBag.CheckInDate" asp-route-checkOutDate="@ViewBag.CheckOutDate">1</a>
+                        </li>
+                        if (startPage > 2)
+                        {
+                            <li class="page-item disabled"><span class="page-link">...</span></li>
+                        }
+                    }
+
+                    for (int i = startPage; i <= endPage; i++)
+                    {
+                        if (i == currentPage)
+                        {
+                            <li class="page-item active">
+                                <span class="page-link">@i <span class="sr-only">(current)</span></span>
+                            </li>
+                        }
+                        else
+                        {
+                            <li class="page-item">
+                                <a class="page-link" asp-action="Index" asp-route-page="@i"
+                                   asp-route-search="@ViewBag.Search" asp-route-roomTypeId="@ViewBag.RoomTypeId"
+                                   asp-route-minPrice="@ViewBag.MinPrice" asp-route-maxPrice="@ViewBag.MaxPrice"
+                                   asp-route-checkInDate="@ViewBag.CheckInDate" asp-route-checkOutDate="@ViewBag.CheckOutDate">@i</a>
+                            </li>
+                        }
+                    }
+
+                    if (endPage < totalPages)
+                    {
+                        if (endPage < totalPages - 1)
+                        {
+                            <li class="page-item disabled"><span class="page-link">...</span></li>
+                        }
+                        <li class="page-item">
+                            <a class="page-link" asp-action="Index" asp-route-page="@totalPages"
+                               asp-route-search="@ViewBag.Search" asp-route-roomTypeId="@ViewBag.RoomTypeId"
+                               asp-route-minPrice="@ViewBag.MinPrice" asp-route-maxPrice="@ViewBag.MaxPrice"
+                               asp-route-checkInDate="@ViewBag.CheckInDate" asp-route-checkOutDate="@ViewBag.CheckOutDate">@totalPages</a>
+                        </li>
+                    }
+                }
+
+                <!-- Next Page -->
+                @if (currentPage < totalPages)
+                {
+                    <li class="page-item">
+                        <a class="page-link" asp-action="Index" asp-route-page="@(currentPage + 1)"
+                           asp-route-search="@ViewBag.Search" asp-route-roomTypeId="@ViewBag.RoomTypeId"
+                           asp-route-minPrice="@ViewBag.MinPrice" asp-route-maxPrice="@ViewBag.MaxPrice"
+                           asp-route-checkInDate="@ViewBag.CheckInDate" asp-route-checkOutDate="@ViewBag.CheckOutDate">
+                            Sau <i class="fas fa-chevron-right"></i>
+                        </a>
+                    </li>
+                }
+                else
+                {
+                    <li class="page-item disabled">
+                        <span class="page-link">Sau <i class="fas fa-chevron-right"></i></span>
+                    </li>
+                }
+            </ul>
+        </nav>
+
+        <div class="text-center text-muted mt-3">
+            <p>Hiển thị @((currentPage - 1) * 10 + 1) - @Math.Min(currentPage * 10, totalRooms) trên @totalRooms phòng</p>
+        </div>
+    }
+</div>

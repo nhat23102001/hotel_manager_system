@@ -1,0 +1,378 @@
+@model IEnumerable<HotelManagement.Web.DTOs.RoomDto>
+@{
+    ViewData["Title"] = "Trang chủ";
+}
+
+<!-- Alerts từ TempData -->
+@if (TempData["LoginSuccess"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert" style="margin-top: 20px;">
+        <i class="fas fa-check-circle"></i> @TempData["LoginSuccess"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+@if (TempData["LoginError"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert" style="margin-top: 20px;">
+        <i class="fas fa-times-circle"></i> @TempData["LoginError"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+@if (TempData["RegisterSuccess"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert" style="margin-top: 20px;">
+        <i class="fas fa-check-circle"></i> @TempData["RegisterSuccess"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+@if (TempData["RegisterError"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert" style="margin-top: 20px;">
+        <i class="fas fa-times-circle"></i> @TempData["RegisterError"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+@if (TempData["ForgotSuccess"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert" style="margin-top: 20px;">
+        <i class="fas fa-check-circle"></i> @TempData["ForgotSuccess"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+@if (TempData["ForgotError"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert" style="margin-top: 20px;">
+        <i class="fas fa-times-circle"></i> @TempData["ForgotError"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+<!-- Hero Area Start -->
+<div class="slider-area hero-bg1 hero-overly">
+    <div class="single-slider slider-height1 d-flex align-items-center">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-xl-7 col-lg-11">
+                    <!-- Hero Caption -->
+                    <div class="hero-caption pt-10">
+                        <h1>Hành trình nghỉ dưỡng trong một bước, nơi đáng nhớ</h1>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- <div class="container">
+        <form asp-area="Client" asp-controller="Booking" asp-action="Search" class="search-box pb-45">
+            <div class="row align-items-end">
+                <div class="col-xl-3 col-lg-6 col-md-6 col-sm-6">
+                    <div class="date-pic mb-15">
+                        <label>Ngày nhận phòng *</label>
+                        <div class="boking-datepicker">
+                            <input id="datepicker1" name="checkInDate" placeholder="Chọn ngày nhận phòng" />
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-3 col-lg-6 col-md-6 col-sm-6">
+                    <div class="date-pic mb-15">
+                        <label>Ngày trả phòng *</label>
+                        <div class="boking-datepicker">
+                            <input id="datepicker2" name="checkOutDate" placeholder="Chọn ngày trả phòng" />
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-2 col-lg-4 col-md-4 col-sm-6">
+                    <div class="select-form mb-15">
+                        <select name="adults" id="select1">
+                            <option value="">Người lớn</option>
+                            <option value="1">1 người</option>
+                            <option value="2">2 người</option>
+                            <option value="3">3 người</option>
+                            <option value="4">4 người</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-xl-2 col-lg-4 col-md-4 col-sm-6">
+                    <div class="select-form mb-15">
+                        <select name="children" id="select2">
+                            <option value="">Trẻ em</option>
+                            <option value="0">Không có</option>
+                            <option value="1">1 trẻ</option>
+                            <option value="2">2 trẻ</option>
+                            <option value="3">3 trẻ</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-xl-2 col-lg-4 col-md-4 col-sm-6">
+                    <div class="search-form">
+                        <button type="submit" class="btn btn-primary w-100">Tìm kiếm</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div> -->
+</div>
+<!-- Hero Area End -->
+
+<!-- About Section Start -->
+<div class="support-company-area section-padding">
+    <div class="container">
+        <div class="row align-items-center justify-content-between">
+            <div class="col-xl-5 col-lg-6 col-md-10">
+                <div class="support-location-img mb-40">
+                    <img src="~/assets/img/gallery/about.jpg" alt="Về chúng tôi">
+                </div>
+            </div>
+            <div class="col-xl-4 col-lg-6 col-md-8">
+                <div class="right-caption">
+                    <div class="section-tittle">
+                        <h2>Sang trọng & Thoải mái</h2>
+                    </div>
+                    <div class="support-caption">
+                        <p class="mb-10">Khách sạn của chúng tôi cung cấp những phòng Urban Double tinh tế và Unique Junior Suite độc đáo, với khả năng tận hưởng một sân hiên được thiết kế hoàn hảo trong Double Urban Loft và Unique Junior Loft Suite.</p>
+                        <a href="##" class="btn_01 about-btn">Tìm hiểu thêm</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-3 col-lg-3 col-md-4">
+                <div class="about-right-img d-none d-xl-block">
+                    <img src="~/assets/img/gallery/about-right.jpg" alt="" class="w-100">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- About Section End -->
+
+<!-- Rooms Section Start -->
+<div class="location-house">
+    <div class="container">
+        <div class="row">
+            <div class="col-xl-4 col-lg-5 col-md-8">
+                <!-- Section Title -->
+                <div class="section-tittle mb-50">
+                    <h2>Phòng của chúng tôi</h2>
+                    <p>Chúng tôi cung cấp các loại phòng hạng sang với dịch vụ tốt nhất.</p>
+                    <a asp-area="Client" asp-controller="Rooms" asp-action="Index" class="btn btn-primary mt-3">Xem tất cả phòng →</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container-fluid">
+        <div class="rows">
+            <div class="location-active owl-carousel">
+                @if (Model != null && Model.Any())
+                {
+                    @foreach (var room in Model)
+                    {
+                        <div class="col-lg-12">
+                            <!-- Single Room -->
+                            <a asp-area="Client" asp-controller="Rooms" asp-action="Details" asp-route-id="@room.Id" style="text-decoration: none; color: inherit;">
+                                <div class="single-location">
+                                    @if (!string.IsNullOrWhiteSpace(room.ImageUrl) && !string.IsNullOrWhiteSpace(room.ImageFileName))
+                                    {
+                                        <img src="@Url.Action("GetImage", "Image", new { area = "Admin", filename = room.ImageFileName })" alt="@room.RoomName" style="height: 400px; object-fit: cover;">
+                                    }
+                                    else
+                                    {
+                                        <div style="height: 400px; background-color: #e9ecef; display: flex; align-items: center; justify-content: center;">
+                                            <i class="fas fa-image" style="font-size: 60px; color: #999;"></i>
+                                        </div>
+                                    }
+                                    <div class="location-contents">
+                                        <h3 style="color: white;">@room.RoomName</h3>
+                                        <p>Tối đa: @room.MaxPeople người</p>
+                                        <div class="price">
+                                            <span>Từ <span>@room.PricePerNight.ToString("N0") VNĐ</span>/đêm</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                    }
+                }
+                else
+                {
+                    <div class="col-lg-12">
+                        <div class="alert alert-info text-center">
+                            Chưa có phòng nào có sẵn.
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Rooms Section End -->
+
+
+
+
+<!-- Services Section Start -->
+<div class="services-area2 section-padding">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-xl-9 col-lg-8">
+                <div class="section-tittle mb-60 text-center">
+                    <h2>Được bao quanh bởi phòng trưng bày, cửa hàng, nhà hàng và quán cà phê, khách sạn của chúng tôi là một trung tâm năng lượng và phong cách.</h2>
+                    <a asp-area="Client" asp-controller="Rooms" asp-action="Index" class="tittle-btn mt-15">Tìm phòng cho bạn</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="row justify-content-center">
+                    <div class="col-xl-10 col-lg-10">
+                        <div class="col-xl-12">
+                            <div class="single-services2 mb-30">
+                                <div class="row">
+                                    <div class="col-xl-6 col-lg-6 col-md-6 p-0">
+                                        <div class="features-img">
+                                            <img src="assets/img/gallery/project-img.jpg" alt="">
+                                        </div>
+                                    </div>
+                                    <div class="col-xl-6 col-lg-6 col-md-6 p-0">
+                                        <div class="features-caption">
+                                            <h3><a href="#">Nhà hàng & Bar</a></h3>
+                                            <p>Thưởng thức ẩm thực tuyệt vời tại nhà hàng 5 sao của chúng tôi.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+    </div>
+</div>
+<!-- Services Section End -->
+
+
+ <!-- video start -->
+        <div class="video-area section-img-bg2 d-flex align-items-center" style="background-image: url(https://preview.colorlib.com/theme/rolax/assets/img/gallery/video-bg.jpg); background-size: cover; background-position: center; background-attachment: fixed; min-height: 500px; padding: 100px 0;" data-background="assets/img/gallery/video-bg.jpg">
+            <div class="container">
+                <div class="video-wrap position-relative">
+                    <!-- Video icon -->
+                    <div class="video-icon" >
+                        <a class="popup-video btn-icon" href="https://www.youtube.com/watch?v=up68UAfH0d0">
+                            <img src="assets/img/icon/video-icon.svg" alt="">
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- video end -->
+
+<!-- Guest Services Start -->
+<div class="guest-house section-padding">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-xl-8 col-lg-8">
+                <!-- Section Title -->
+                <div class="section-tittle text-center mb-50">
+                    <h2>Những gì chúng tôi cung cấp cho khách</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-4 col-md-6 col-sm-6">
+                <div class="single-location mb-30">
+                    <img src="~/assets/img/gallery/guest1.jpg" alt="">
+                    <div class="guest-contents guest-contents2">
+                        <h3><a href="#">Đồ uống miễn phí</a></h3>
+                    </div>
+                    <div class="guest-contents">
+                        <h3><a href="#">Bữa sáng miễn phí</a></h3>
+                        <p>Khách sạn của chúng tôi cung cấp bữa sáng hàng ngày và các loại đồ uống cao cấp cho tất cả khách.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-6 col-sm-6">
+                <div class="single-location mb-30">
+                    <img src="~/assets/img/gallery/guest2.jpg" alt="">
+                    <div class="guest-contents guest-contents2">
+                        <h3><a href="#">WiFi miễn phí</a></h3>
+                    </div>
+                    <div class="guest-contents">
+                        <h3><a href="#">Bữa sáng miễn phí</a></h3>
+                        <p>Kết nối Internet tốc độ cao miễn phí trong tất cả các phòng và khu vực chung của khách sạn.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-6 col-sm-6">
+                <div class="single-location mb-30">
+                    <img src="~/assets/img/gallery/guest3.jpg" alt="">
+                    <div class="guest-contents guest-contents2">
+                        <h3><a href="#">Bữa tối miễn phí</a></h3>
+                    </div>
+                    <div class="guest-contents">
+                        <h3><a href="#">Bữa sáng miễn phí</a></h3>
+                        <p>Bữa tối cao cấp tại nhà hàng 5 sao của khách sạn chúng tôi.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Guest Services End -->
+
+<!-- Testimonials Section Start -->
+<section class="client-say">
+    <div class="container">
+        <div class="custom-row">
+            <div class="client-active">
+                <div class="col-lg-5 col-md-6 col-sm-6">
+                    <div class="client-caption">
+                        <h3>Chỗ ở tuyệt vời</h3>
+                        <p>"Khách sạn này thực sự tuyệt vời! Phòng sạch sẽ, thoải mái và nhân viên rất thân thiện. Tôi sẽ quay lại lần nữa."</p>
+                        <!-- Founder -->
+                        <div class="testimonial-founder d-flex align-items-center mt-30">
+                            <div class="founder-text">
+                                <span>- Nguyễn Văn A</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-5 col-md-6 col-sm-6">
+                    <div class="client-caption">
+                        <h3>Thức ăn ngon miệng</h3>
+                        <p>"Nhà hàng tại đây phục vụ những món ăn rất ngon. Các đầu bếp biết cách làm cho mọi bữa ăn trở nên đặc biệt."</p>
+                        <!-- Founder -->
+                        <div class="testimonial-founder d-flex align-items-center mt-30">
+                            <div class="founder-text">
+                                <span>- Trần Thị B</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-5 col-md-6 col-sm-6">
+                    <div class="client-caption">
+                        <h3>Dịch vụ chuyên nghiệp</h3>
+                        <p>"Đội ngũ nhân viên rất chuyên nghiệp và thân thiện. Họ sẵn sàng giúp đỡ với mọi yêu cầu của tôi."</p>
+                        <!-- Founder -->
+                        <div class="testimonial-founder d-flex align-items-center mt-30">
+                            <div class="founder-text">
+                                <span>- Lê Văn C</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- Testimonials Section End -->
+
+@section Scripts {
+    <script src="~/assets/js/gijgo.min.js"></script>
+    <script>
+        $('#datepicker1').datepicker({
+            uiLibrary: 'bootstrap5'
+        });
+        $('#datepicker2').datepicker({
+            uiLibrary: 'bootstrap5'
+        });
+    </script>
+}

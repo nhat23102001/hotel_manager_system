@@ -1,0 +1,416 @@
+@model HotelManagement.Web.DTOs.RoomDto
+@{
+    ViewData["Title"] = "Chi tiết phòng - " + Model.RoomName;
+}
+
+
+<!-- Hero Area Start-->
+<div class="slider-area hero-bg1 hero-overly" style="margin-top: 40px; padding-top: 40px;">
+    <div class="single-slider slider-height3 d-flex align-items-center">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-xl-7 col-lg-11">
+                    <div class="hero-caption hero-caption3">
+                        <h1>Chi tiết phòng</h1>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!--Hero Area End-->
+
+
+<div class="container py-5" style="margin-top: 10px;">
+    <div class="row mb-4">
+        <div class="col-12">
+            <a asp-action="Index" class="btn btn-secondary btn-sm">
+                <i class="bi bi-arrow-left"></i> Quay lại
+            </a>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-6">
+            @if (!string.IsNullOrWhiteSpace(Model.ImageUrl) && !string.IsNullOrWhiteSpace(Model.ImageFileName))
+            {
+                <img src="@Url.Action("GetImage", "Image", new { area = "Admin", filename = Model.ImageFileName })" 
+                     alt="@Model.RoomName" class="img-fluid rounded mb-3" />
+            }
+            else
+            {
+                <div class="bg-light rounded d-flex align-items-center justify-content-center mb-3" style="height: 400px;">
+                    <span class="text-muted">Chưa có ảnh</span>
+                </div>
+            }
+        </div>
+
+        <div class="col-lg-6">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-4">
+                    <h2 class="mb-3">@Model.RoomName</h2>
+                    
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <label class="form-label text-muted">Mã phòng</label>
+                            <p class="fw-bold">@Model.RoomCode</p>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label text-muted">Loại phòng</label>
+                            <p class="fw-bold">@Model.RoomType</p>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label text-muted">Số người tối đa</label>
+                            <p class="fw-bold">@Model.MaxPeople người</p>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label text-muted">Trạng thái</label>
+                            <p>
+                                @if (Model.Status == "Available")
+                                {
+                                    <span class="badge bg-success">Khả dụng</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-warning">@Model.Status</span>
+                                }
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="row g-3 mb-4">
+                        <div class="col-12">
+                            <h4 class="text-success mb-2">
+                                <strong>@Model.PricePerNight.ToString("N0") VNĐ</strong>/đêm
+                            </h4>
+                        </div>
+                    </div>
+
+                    @if (!string.IsNullOrWhiteSpace(Model.Description))
+                    {
+                        <div class="mb-4">
+                            <label class="form-label text-muted">Mô tả</label>
+                            <p>@Model.Description</p>
+                        </div>
+                    }
+
+                    <div class="d-flex gap-2">
+                        @if (User.Identity?.IsAuthenticated == true)
+                        {
+                            <button class="btn btn-primary flex-grow-1" data-bs-toggle="modal" data-bs-target="#bookingModal">
+                                <i class="bi bi-calendar-check"></i> Đặt phòng
+                            </button>
+                        }
+                        else
+                        {
+                            <button class="btn btn-primary flex-grow-1" data-bs-toggle="modal" data-bs-target="#loginModal">
+                                <i class="bi bi-calendar-check"></i> Đặt phòng (Yêu cầu đăng nhập)
+                            </button>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@if (User.Identity?.IsAuthenticated == true)
+{
+    <!-- Booking Modal -->
+    <div class="modal fade" id="bookingModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <form asp-action="CreateBooking" method="post" id="bookingForm">
+                    <input type="hidden" asp-for="Id" name="RoomId" value="@Model.Id" />
+                    <div class="modal-header">
+                        <h5 class="modal-title">Đặt phòng - @Model.RoomName</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body" style="max-height: 80vh; overflow-y: auto;">
+                        @if (TempData["BookingError"] != null)
+                        {
+                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                @TempData["BookingError"]
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                        }
+
+                        <input type="hidden" asp-for="Id" name="RoomId" value="@Model.Id" />
+
+                        <div class="row g-3">
+                            <!-- Dates -->
+                            <div class="col-md-6">
+                                <label class="form-label">Ngày nhận phòng <span class="text-danger">*</span></label>
+                                <input type="date" class="form-control" name="CheckInDate" id="checkInDate"
+                                       min="@DateTime.Today.ToString("yyyy-MM-dd")" required />
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Ngày trả phòng <span class="text-danger">*</span></label>
+                                <input type="date" class="form-control" name="CheckOutDate" id="checkOutDate"
+                                       min="@DateTime.Today.AddDays(1).ToString("yyyy-MM-dd")" required />
+                            </div>
+
+                            <!-- Guest Info -->
+                            <div class="col-md-6">
+                                <label class="form-label">Tên khách hàng <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" name="GuestName" required maxlength="100" />
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Số điện thoại <span class="text-danger">*</span></label>
+                                <input type="tel" class="form-control" name="PhoneNumber" required />
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label">Email <span class="text-danger">*</span></label>
+                                <input type="email" class="form-control" name="Email" id="emailInput"
+                                       value="@ViewBag.UserEmail" required />
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label">Địa chỉ</label>
+                                <input type="text" class="form-control" name="Address" maxlength="200" />
+                            </div>
+
+                            <!-- Services Selection -->
+                            <div class="col-12">
+                                <hr class="my-3" />
+                                <h6 class="mb-3"><i class="bi bi-stars"></i> Dịch vụ đi kèm (tùy chọn)</h6>
+                                <div id="servicesContainer">
+                                    <div class="spinner-border spinner-border-sm" role="status">
+                                        <span class="visually-hidden">Loading...</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-12">
+                                <label class="form-label"><strong>Ghi chú</strong></label>
+                                <textarea class="form-control" name="Notes" rows="3"></textarea>
+                            </div>
+
+                            <!-- Room Info -->
+                            <div class="col-12">
+                                <hr class="my-3" />
+                                <div class="card bg-light">
+                                    <div class="card-body">
+                                        <h6><strong>Thông tin phòng:</strong></h6>
+                                        <p class="mb-1"><strong>Phòng:</strong> @Model.RoomName (@Model.RoomCode)</p>
+                                        <p class="mb-1"><strong>Loại phòng:</strong> @Model.RoomType</p>
+                                        <p class="mb-0"><strong>Giá:</strong> <span id="roomPrice" data-price="@Model.PricePerNight">@Model.PricePerNight.ToString("N0")</span> VNĐ/đêm</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Price Summary -->
+                            <div class="col-12">
+                                <div class="card border-primary">
+                                    <div class="card-body">
+                                        <h6 class="mb-3"><strong>Tóm tắt giá:</strong></h6>
+                                        <div class="d-flex justify-content-between mb-2">
+                                            <span>Tiền phòng (<span id="nightsCount">0</span> đêm):</span>
+                                            <strong id="roomTotal">0 VNĐ</strong>
+                                        </div>
+                                        <div class="d-flex justify-content-between mb-2" id="servicesRow" style="display: none;">
+                                            <span>Dịch vụ đi kèm:</span>
+                                            <strong id="servicesTotal">0 VNĐ</strong>
+                                        </div>
+                                        <div class="d-flex justify-content-between mb-2">
+                                            <span>Tạm tính:</span>
+                                            <strong id="subtotal">0 VNĐ</strong>
+                                        </div>
+                                        <div class="d-flex justify-content-between mb-2">
+                                            <span>VAT (10%):</span>
+                                            <strong id="vat">0 VNĐ</strong>
+                                        </div>
+                                        <hr />
+                                        <div class="d-flex justify-content-between">
+                                            <span class="fs-5 fw-bold">Tổng cộng:</span>
+                                            <span class="fs-4 fw-bold text-success" id="totalAmount">0 VNĐ</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-check-circle"></i> Xác nhận đặt phòng
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+}
+else
+{
+    <!-- Login Required Modal -->
+    <div class="modal fade" id="loginModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Yêu cầu đăng nhập</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body text-center py-4">
+                    <i class="bi bi-exclamation-circle text-warning" style="font-size: 3rem;"></i>
+                    <h5 class="mt-3 mb-2">Vui lòng đăng nhập để đặt phòng</h5>
+                    <p class="text-muted">Bạn cần đăng nhập để có thể sử dụng chức năng đặt phòng.</p>
+                </div>
+                <div class="modal-footer justify-content-center">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                    <a href="@Url.Action("Login", "Auth", new { area = "Client", returnUrl = Context.Request.Path })" 
+                       class="btn btn-primary">
+                        <i class="bi bi-box-arrow-in-right"></i> Đăng nhập ngay
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@section Scripts {
+    <script>
+        // Fetch services from API instead of loading on page
+        async function loadServices() {
+            try {
+                const response = await fetch('@Url.Action("GetServices", "Rooms")');
+                if (!response.ok) throw new Error('Failed to load services');
+                const servicesData = await response.json();
+                renderServices(servicesData);
+            } catch (error) {
+                console.error('Error loading services:', error);
+                document.getElementById('servicesContainer').innerHTML = 
+                    '<div class="alert alert-warning">Không thể tải danh sách dịch vụ</div>';
+            }
+        }
+
+        function renderServices(servicesData) {
+            const container = document.getElementById('servicesContainer');
+            if (!servicesData || servicesData.length === 0) {
+                container.innerHTML = '<div class="alert alert-info">Không có dịch vụ nào khả dụng</div>';
+                return;
+            }
+
+            // Group services by type
+            const grouped = {};
+            servicesData.forEach(service => {
+                if (!grouped[service.serviceTypeName]) {
+                    grouped[service.serviceTypeName] = [];
+                }
+                grouped[service.serviceTypeName].push(service);
+            });
+
+            let html = '';
+            for (const [typeName, typeServices] of Object.entries(grouped)) {
+                html += `<div class="card bg-light mb-2">
+                    <div class="card-body p-2">
+                        <h6 class="mb-2 text-primary"><strong>${typeName}</strong></h6>`;
+                
+                typeServices.forEach(service => {
+                    const description = service.description ? `<small class="text-muted">- ${service.description}</small>` : '';
+                    html += `<div class="form-check mb-1">
+                        <input class="form-check-input service-checkbox" 
+                               type="checkbox" 
+                               name="ServiceIds" 
+                               value="${service.id}"
+                               id="service_${service.id}"
+                               data-price="${service.unitPrice}">
+                        <label class="form-check-label d-flex justify-content-between align-items-center w-100" 
+                               for="service_${service.id}" style="cursor: pointer;">
+                            <span>
+                                ${service.name}
+                                ${description}
+                            </span>
+                            <strong class="text-success">${new Intl.NumberFormat('vi-VN').format(service.unitPrice)} VNĐ/${service.unit}</strong>
+                        </label>
+                    </div>`;
+                });
+                
+                html += `</div></div>`;
+            }
+
+            container.innerHTML = html;
+
+            // Re-attach event listeners
+            document.querySelectorAll('.service-checkbox').forEach(checkbox => {
+                checkbox.addEventListener('change', calculateTotal);
+            });
+
+            calculateTotal();
+        }
+
+        const roomPricePerNight = parseFloat(document.getElementById('roomPrice').dataset.price);
+
+        function formatCurrency(amount) {
+            return new Intl.NumberFormat('vi-VN').format(amount) + ' VNĐ';
+        }
+
+        function calculateTotal() {
+            const checkInDate = document.getElementById('checkInDate').value;
+            const checkOutDate = document.getElementById('checkOutDate').value;
+
+            if (!checkInDate || !checkOutDate) {
+                return;
+            }
+
+            const checkIn = new Date(checkInDate);
+            const checkOut = new Date(checkOutDate);
+            const nights = Math.max(0, Math.floor((checkOut - checkIn) / (1000 * 60 * 60 * 24)));
+
+            // Calculate room total
+            const roomTotal = roomPricePerNight * nights;
+
+            // Calculate services total
+            let servicesTotal = 0;
+            document.querySelectorAll('.service-checkbox:checked').forEach(checkbox => {
+                servicesTotal += parseFloat(checkbox.dataset.price);
+            });
+
+            // Calculate totals
+            const subtotal = roomTotal + servicesTotal;
+            const vat = subtotal * 0.1;
+            const totalAmount = subtotal + vat;
+
+            // Update display
+            document.getElementById('nightsCount').textContent = nights;
+            document.getElementById('roomTotal').textContent = formatCurrency(roomTotal);
+            document.getElementById('servicesTotal').textContent = formatCurrency(servicesTotal);
+            document.getElementById('subtotal').textContent = formatCurrency(subtotal);
+            document.getElementById('vat').textContent = formatCurrency(vat);
+            document.getElementById('totalAmount').textContent = formatCurrency(totalAmount);
+
+            // Show/hide services row
+            const servicesRow = document.getElementById('servicesRow');
+            if (servicesTotal > 0) {
+                servicesRow.style.display = 'flex';
+            } else {
+                servicesRow.style.display = 'none';
+            }
+        }
+
+        // Auto-update checkout date min when checkin date changes
+        document.getElementById('checkInDate')?.addEventListener('change', function() {
+            const checkInDate = new Date(this.value);
+            checkInDate.setDate(checkInDate.getDate() + 1);
+            const minCheckOut = checkInDate.toISOString().split('T')[0];
+            document.getElementById('checkOutDate').min = minCheckOut;
+            calculateTotal();
+        });
+
+        // Update total when checkout date changes
+        document.getElementById('checkOutDate')?.addEventListener('change', calculateTotal);
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            loadServices();
+        });
+
+        // Show error modal if TempData has error
+        @if (TempData["BookingError"] != null)
+        {
+            <text>
+            var bookingModal = new bootstrap.Modal(document.getElementById('bookingModal'));
+            bookingModal.show();
+            </text>
+        }
+    </script>
+}
