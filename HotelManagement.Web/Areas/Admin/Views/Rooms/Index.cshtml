@@ -1,6 +1,7 @@
 @model IEnumerable<HotelManagement.Web.DTOs.RoomDto>
 @{
     ViewData["Title"] = "Quản lý phòng";
+    var roomDtos = ViewBag.RoomDtos as IEnumerable<HotelManagement.Web.DTOs.RoomDto> ?? Model;
 }
 
 <div class="d-flex justify-content-between align-items-center mb-4">
@@ -87,7 +88,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach (var item in Model)
+                    @foreach (var item in roomDtos)
                     {
                         <tr>
                             <td><strong>@item.RoomCode</strong></td>
@@ -103,31 +104,80 @@
                                 
                                 @if (!string.IsNullOrWhiteSpace(ViewBag.CheckInDate) && !string.IsNullOrWhiteSpace(ViewBag.CheckOutDate))
                                 {
-                                    @if (hasBooking)
+                                    @* Khi có filter ngày - hiển thị trạng thái động đã tính toán *@
+                                    @if (item.Status == "Còn trống")
                                     {
-                                        var booking = roomBookings[item.Id].First();
-                                        <span class="badge bg-danger mb-1"><i class="bi bi-person-fill"></i> Đã đặt</span>
-                                        <small class="d-block text-muted">Khách: <strong>@booking.CustomerName</strong></small>
-                                        <small class="d-block text-muted">@booking.CheckInDate.ToString("dd/MM") - @booking.CheckOutDate.ToString("dd/MM/yyyy")</small>
+                                        <span class="badge bg-success"><i class="bi bi-check-circle"></i> Còn trống</span>
+                                    }
+                                    else if (item.Status == "Đã đặt")
+                                    {
+                                        <span class="badge bg-warning text-dark"><i class="bi bi-calendar-check"></i> Đã đặt</span>
+                                    }
+                                    else if (item.Status == "Đang sử dụng")
+                                    {
+                                        <span class="badge bg-danger"><i class="bi bi-person-fill"></i> Đang sử dụng</span>
+                                    }
+                                    else if (item.Status == "Bảo trì")
+                                    {
+                                        <span class="badge bg-dark"><i class="bi bi-tools"></i> Bảo trì</span>
+                                        @if (User.IsInRole("Admin"))
+                                        {
+                                            <form asp-action="UpdateRoomStatus" method="post" style="display: inline;" class="mt-1">
+                                                @Html.AntiForgeryToken()
+                                                <input type="hidden" name="id" value="@item.Id" />
+                                                <input type="hidden" name="status" value="Còn trống" />
+                                                <button type="submit" class="btn btn-sm btn-outline-success" onclick="return confirm('Chuyển phòng sang trạng thái Còn trống?')">
+                                                    <i class="bi bi-arrow-clockwise"></i> Còn trống
+                                                </button>
+                                            </form>
+                                        }
                                     }
                                     else
                                     {
-                                        <span class="badge bg-success"><i class="bi bi-check-circle"></i> Còn trống</span>
+                                        <span class="badge bg-light text-dark">@item.Status</span>
+                                    }
+                                    
+                                    @* Hiển thị thông tin booking nếu có *@
+                                    @if (hasBooking)
+                                    {
+                                        var booking = roomBookings[item.Id].First();
+                                        <small class="d-block text-muted mt-1">Khách: <strong>@booking.CustomerName</strong></small>
+                                        <small class="d-block text-muted">@booking.CheckInDate.ToString("dd/MM") - @booking.CheckOutDate.ToString("dd/MM/yyyy")</small>
                                     }
                                 }
                                 else
                                 {
-                                    @if (item.Status == "Available")
+                                    @* Khi KHÔNG filter ngày - hiển thị trạng thái tĩnh từ database *@
+                                    @if (item.Status == "Available" || item.Status == "Còn trống")
                                     {
-                                        <span class="badge bg-success">Khả dụng</span>
+                                        <span class="badge bg-success"><i class="bi bi-check-circle"></i> Khả dụng</span>
+                                    }
+                                    else if (item.Status == "Bảo trì")
+                                    {
+                                        <span class="badge bg-warning text-dark"><i class="bi bi-tools"></i> Bảo trì</span>
+                                        @if (User.IsInRole("Admin"))
+                                        {
+                                            <form asp-action="UpdateRoomStatus" method="post" style="display: inline;" class="mt-1">
+                                                @Html.AntiForgeryToken()
+                                                <input type="hidden" name="id" value="@item.Id" />
+                                                <input type="hidden" name="status" value="Available" />
+                                                <button type="submit" class="btn btn-sm btn-outline-success" onclick="return confirm('Chuyển phòng sang trạng thái Khả dụng?')">
+                                                    <i class="bi bi-arrow-clockwise"></i> Khả dụng
+                                                </button>
+                                            </form>
+                                        }
                                     }
                                     else if (item.Status == "Maintenance")
                                     {
-                                        <span class="badge bg-warning text-dark">Bảo trì</span>
+                                        <span class="badge bg-warning text-dark"><i class="bi bi-tools"></i> Bảo trì</span>
+                                    }
+                                    else if (item.Status == "Không khả dụng")
+                                    {
+                                        <span class="badge bg-secondary"><i class="bi bi-x-circle"></i> Không khả dụng</span>
                                     }
                                     else
                                     {
-                                        <span class="badge bg-warning">@item.Status</span>
+                                        <span class="badge bg-light text-dark">@item.Status</span>
                                     }
                                 }
                             </td>
@@ -141,7 +191,7 @@
                             </td>
                         </tr>
                     }
-                    @if (!Model.Any())
+                    @if (!roomDtos.Any())
                     {
                         <tr>
                             <td colspan="7" class="text-center text-muted">Không tìm thấy phòng nào.</td>

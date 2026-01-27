@@ -43,7 +43,75 @@ namespace HotelManagement.Web.Areas.Admin.Controllers
 
             var rooms = await query
                 .OrderBy(r => r.RoomCode)
-                .Select(r => new RoomDto
+                .ToListAsync();
+
+            var currentDate = DateTime.Now.Date;
+            
+            // Chỉ tính toán trạng thái động khi có filter ngày
+            if (checkInDate.HasValue && checkOutDate.HasValue)
+            {
+                // Lấy tất cả booking hiện tại để tính trạng thái phòng
+                var currentBookings = await _dbContext.BookingDetails
+                    .Include(bd => bd.Booking)
+                    .ThenInclude(b => b!.User)
+                    .ThenInclude(u => u!.Profile)
+                    .Where(bd => bd.Booking != null && 
+                                bd.Booking.Status == "Confirmed")
+                    .ToListAsync();
+
+                var roomDtos = rooms.Select(r => {
+                    // Tính toán trạng thái phòng dựa trên booking hiện tại
+                    var roomBookings = currentBookings.Where(bd => bd.RoomId == r.Id).ToList();
+                    string calculatedStatus = CalculateRoomStatus(r, roomBookings, currentDate);
+
+                    return new RoomDto
+                    {
+                        Id = r.Id,
+                        RoomCode = r.RoomCode,
+                        RoomName = r.RoomName,
+                        RoomTypeId = r.RoomTypeId,
+                        RoomType = r.RoomType != null ? r.RoomType.Name : "",
+                        PricePerNight = r.PricePerNight,
+                        MaxPeople = r.MaxPeople,
+                        Status = calculatedStatus, // Sử dụng trạng thái được tính toán
+                        Description = r.Description,
+                        ImageUrl = r.ImageUrl,
+                        IsActive = r.IsActive
+                    };
+                }).ToList();
+
+                // Lấy danh sách booking trùng với khoảng thời gian
+                var roomIds = rooms.Select(r => r.Id).ToList();
+                var bookingDetails = await _dbContext.BookingDetails
+                    .Include(bd => bd.Booking)
+                    .ThenInclude(b => b!.User)
+                    .ThenInclude(u => u!.Profile)
+                    .Where(bd => roomIds.Contains(bd.RoomId) &&
+                                 bd.Booking != null &&
+                                 bd.Booking.Status == "Confirmed" &&
+                                 bd.Booking.CheckInDate < checkOutDate.Value &&
+                                 bd.Booking.CheckOutDate > checkInDate.Value)
+                    .ToListAsync();
+
+                var bookings = bookingDetails.Select(bd => new
+                {
+                    RoomId = bd.RoomId,
+                    CustomerName = bd.Booking!.User?.Profile?.FullName ?? bd.Booking.User?.Username ?? "N/A",
+                    CheckInDate = bd.Booking.CheckInDate,
+                    CheckOutDate = bd.Booking.CheckOutDate,
+                    Status = bd.Booking.Status
+                }).ToList();
+                
+                ViewBag.RoomBookings = bookings.GroupBy(b => b.RoomId)
+                    .ToDictionary(g => g.Key, g => g.ToList());
+
+                // Truyền roomDtos đã tính toán trạng thái
+                ViewBag.RoomDtos = roomDtos;
+            }
+            else
+            {
+                // Không filter ngày - sử dụng trạng thái tĩnh từ database
+                var roomDtos = rooms.Select(r => new RoomDto
                 {
                     Id = r.Id,
                     RoomCode = r.RoomCode,
@@ -52,46 +120,14 @@ namespace HotelManagement.Web.Areas.Admin.Controllers
                     RoomType = r.RoomType != null ? r.RoomType.Name : "",
                     PricePerNight = r.PricePerNight,
                     MaxPeople = r.MaxPeople,
-                    Status = r.Status,
+                    Status = r.Status, // Sử dụng trạng thái tĩnh từ database
                     Description = r.Description,
                     ImageUrl = r.ImageUrl,
                     IsActive = r.IsActive
-                })
-                .ToListAsync();
+                }).ToList();
 
-            // Nếu có chọn khoảng thời gian, lấy thông tin booking cho từng phòng
-            if (checkInDate.HasValue && checkOutDate.HasValue)
-            {
-                var roomIds = rooms.Select(r => r.Id).ToList();
-                
-                // Lấy danh sách booking trùng với khoảng thời gian
-                var bookings = await _dbContext.BookingDetails
-                    .Include(bd => bd.Booking)
-                    .ThenInclude(b => b.User)
-                    .ThenInclude(u => u.Profile)
-                    .Where(bd => roomIds.Contains(bd.RoomId) &&
-                                 bd.Booking.Status != "Cancelled" &&
-                                 bd.Booking.CheckInDate < checkOutDate.Value &&
-                                 bd.Booking.CheckOutDate > checkInDate.Value)
-                    .Select(bd => new
-                    {
-                        RoomId = bd.RoomId,
-                        CustomerName = bd.Booking.User.Profile != null 
-                            ? bd.Booking.User.Profile.FullName 
-                            : bd.Booking.User.Username,
-                        CheckInDate = bd.Booking.CheckInDate,
-                        CheckOutDate = bd.Booking.CheckOutDate,
-                        Status = bd.Booking.Status
-                    })
-                    .ToListAsync();
-                
-                // Tạo dictionary để tra cứu nhanh
-                ViewBag.RoomBookings = bookings.GroupBy(b => b.RoomId)
-                    .ToDictionary(g => g.Key, g => g.ToList());
-            }
-            else
-            {
                 ViewBag.RoomBookings = new Dictionary<int, List<object>>();
+                ViewBag.RoomDtos = roomDtos;
             }
 
             ViewBag.RoomTypes = await _dbContext.RoomTypes
@@ -104,7 +140,7 @@ namespace HotelManagement.Web.Areas.Admin.Controllers
             ViewBag.CheckInDate = checkInDate?.ToString("yyyy-MM-dd");
             ViewBag.CheckOutDate = checkOutDate?.ToString("yyyy-MM-dd");
 
-            return View(rooms);
+            return View(ViewBag.RoomDtos);
         }
 
         [Authorize(Roles = "Admin")]
@@ -301,6 +337,38 @@ namespace HotelManagement.Web.Areas.Admin.Controllers
             return View(model);
         }
 
+        // Action để cập nhật trạng thái phòng
+        [Authorize(Roles = "Admin")]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> UpdateRoomStatus(int id, string status)
+        {
+            var room = await _dbContext.Rooms.FindAsync(id);
+            if (room == null)
+            {
+                return NotFound();
+            }
+
+            if (status == "Available" && room.Status == "Bảo trì")
+            {
+                room.Status = "Available";
+                await _dbContext.SaveChangesAsync();
+                TempData["Success"] = $"Đã cập nhật trạng thái phòng {room.RoomCode} thành 'Khả dụng'.";
+            }
+            else if (status == "Còn trống" && room.Status == "Bảo trì")
+            {
+                room.Status = "Còn trống";
+                await _dbContext.SaveChangesAsync();
+                TempData["Success"] = $"Đã cập nhật trạng thái phòng {room.RoomCode} thành 'Còn trống'.";
+            }
+            else
+            {
+                TempData["Error"] = "Không thể cập nhật trạng thái phòng.";
+            }
+
+            return RedirectToAction(nameof(Index));
+        }
+
         private async Task LoadRoomTypesList()
         {
             ViewBag.RoomTypes = await _dbContext.RoomTypes
@@ -354,6 +422,55 @@ namespace HotelManagement.Web.Areas.Admin.Controllers
                 ".webp" => "image/webp",
                 _ => "application/octet-stream"
             };
+        }
+
+        // Cập nhật phương thức tính toán trạng thái phòng theo yêu cầu mới
+        private string CalculateRoomStatus(Room room, List<HotelManagement.Web.Entities.BookingDetail> bookings, DateTime currentDate)
+        {
+            if (!room.IsActive)
+            {
+                return "Không khả dụng";
+            }
+
+            // Kiểm tra nếu phòng đang ở trạng thái bảo trì (được set thủ công)
+            if (room.Status == "Bảo trì")
+            {
+                return "Bảo trì";
+            }
+
+            // Kiểm tra booking hiện tại
+            foreach (var booking in bookings)
+            {
+                if (booking.Booking == null) continue;
+
+                var checkIn = booking.Booking.CheckInDate.Date;
+                var checkOut = booking.Booking.CheckOutDate.Date;
+
+                if (booking.Booking.Status == "Confirmed")
+                {
+                    // Nếu ngày hiện tại >= check-in và < check-out → Đang sử dụng
+                    if (currentDate >= checkIn && currentDate < checkOut)
+                    {
+                        return "Đang sử dụng";
+                    }
+                    // Nếu ngày hiện tại >= check-out → Bảo trì (tự động)
+                    else if (currentDate >= checkOut)
+                    {
+                        // Cập nhật trạng thái phòng trong database thành bảo trì
+                        room.Status = "Bảo trì";
+                        _dbContext.SaveChanges();
+                        return "Bảo trì";
+                    }
+                    // Nếu ngày hiện tại < check-in → Đã đặt
+                    else if (currentDate < checkIn)
+                    {
+                        return "Đã đặt";
+                    }
+                }
+            }
+
+            // Nếu không có booking nào hoặc booking đã hủy → Còn trống
+            return "Còn trống";
         }
     }
 }
