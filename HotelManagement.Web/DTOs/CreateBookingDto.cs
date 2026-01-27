@@ -37,6 +37,9 @@ namespace HotelManagement.Web.DTOs
         public string? Notes { get; set; }
 
         public int RoomId { get; set; }
+        
+        // Thêm UserId để nhận từ form
+        public int? UserId { get; set; }
 
         public List<int> ServiceIds { get; set; } = new List<int>();
     }
