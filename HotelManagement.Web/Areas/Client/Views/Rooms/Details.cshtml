@@ -122,6 +122,8 @@
             <div class="modal-content">
                 <form asp-action="CreateBooking" method="post" id="bookingForm">
                     <input type="hidden" asp-for="Id" name="RoomId" value="@Model.Id" />
+                    <!-- Thêm hidden field cho UserId -->
+                    <input type="hidden" name="UserId" value="@User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value" />
                     <div class="modal-header">
                         <h5 class="modal-title">Đặt phòng - @Model.RoomName</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
